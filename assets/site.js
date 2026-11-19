@@ -2,12 +2,25 @@
   'use strict';
 
   var $ = function (s) { return document.querySelector(s); };
-  var HOME_MAX = 24; // caselle mostrate in homepage
+  var HOME_MAX = 24; // foto mostrate nella griglia della homepage
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
+  }
+
+  /* ---------- Dati: cartelle → progetti → foto ---------- */
+  function normalize(albums) {
+    albums.forEach(function (a) {
+      if (!Array.isArray(a.projects)) {
+        a.projects = (a.photos && a.photos.length)
+          ? [{ slug: 'untitled', title: 'Untitled', year: '', description: '', cover: a.cover || '', photos: a.photos }]
+          : [];
+      }
+      a.projects.forEach(function (p) { if (!Array.isArray(p.photos)) p.photos = []; });
+    });
+    return albums;
   }
 
   function load() {
@@ -16,22 +29,51 @@
       fetch('content/site.json' + t).then(function (r) { return r.json(); }),
       fetch('content/albums.json' + t).then(function (r) { return r.json(); })
     ]).then(function (res) {
-      return { site: res[0], albums: res[1].albums || [] };
+      return { site: res[0], albums: normalize(res[1].albums || []) };
     });
   }
 
   function albumUrl(a) { return 'album.html?a=' + encodeURIComponent(a.slug); }
+  function projectUrl(a, pr) { return albumUrl(a) + '&p=' + encodeURIComponent(pr.slug); }
+  function first(arr, fn) { for (var i = 0; i < arr.length; i++) if (fn(arr[i])) return arr[i]; return null; }
 
-  function coverOf(a) {
-    var ph = a.photos || [];
-    if (!ph.length) return null;
-    for (var i = 0; i < ph.length; i++) if (ph[i].src === a.cover) return ph[i];
-    return ph[0];
+  function projectCover(pr) {
+    if (!pr.photos.length) return null;
+    return first(pr.photos, function (p) { return p.src === pr.cover; }) || pr.photos[0];
+  }
+  function albumCover(a) {
+    var pr = first(a.projects, function (x) { return x.slug === a.coverProject && x.photos.length; }) ||
+             first(a.projects, function (x) { return x.photos.length; });
+    return pr ? projectCover(pr) : null;
+  }
+  function photoCount(a) { return a.projects.reduce(function (n, p) { return n + p.photos.length; }, 0); }
+
+  // alterna le foto: una per progetto, a turno
+  function interleave(lists) {
+    var out = [], max = 0;
+    lists.forEach(function (l) { max = Math.max(max, l.length); });
+    for (var i = 0; i < max; i++) lists.forEach(function (l) { if (l[i]) out.push(l[i]); });
+    return out;
+  }
+  function albumItems(a) {
+    return interleave(a.projects.map(function (pr) {
+      return pr.photos.map(function (p) { return { p: p, album: a, project: pr }; });
+    }));
   }
 
   function img(p, alt, eager) {
     return '<img src="' + esc(p.thumb || p.src) + '" alt="' + esc(alt) + '" width="' + (p.tw || p.w || 900) +
       '" height="' + (p.th || p.h || 1125) + '"' + (eager ? '' : ' loading="lazy"') + ' decoding="async">';
+  }
+
+  function tiles(items, withLabel) {
+    return items.map(function (it, i) {
+      var w = it.p.tw || it.p.w || 4, h = it.p.th || it.p.h || 5;
+      var r = Math.max(0.4, Math.min(3, w / h)).toFixed(4);
+      return '<button type="button" class="tile" style="--r:' + r + '" data-i="' + i + '" aria-label="Open photo ' + (i + 1) + '">' +
+        '<i aria-hidden="true"></i>' + img(it.p, it.p.caption || it.project.title, i < 4) +
+        (withLabel ? '<span class="lab">' + esc(it.album.title) + '</span>' : '') + '</button>';
+    }).join('');
   }
 
   function nameHtml(n) {
@@ -68,19 +110,24 @@
     setTimeout(function () { t.remove(); }, 2200);
   }
 
-  /* ---------- Visualizzazione a schermo intero (condivisa) ---------- */
-  // items: [{ p: foto, album: cartella }]; withLink: mostra "Apri la cartella"
+  function share(title, msg) {
+    var url = location.href;
+    if (navigator.share) navigator.share({ title: title, url: url }).catch(function () {});
+    else if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { toast(msg); });
+  }
+
+  /* ---------- Visualizzazione a schermo intero ---------- */
   function lightbox(withLink) {
     var lb = $('#lb'), lbImg = $('#lb-img'), cur = 0, items = [], lastBtn = null;
     function show(i) {
       cur = (i + items.length) % items.length;
       var it = items[cur], p = it.p;
       lbImg.src = p.src;
-      lbImg.alt = p.caption || it.album.title + ' ' + (cur + 1);
-      $('#lb-count').textContent = (withLink ? it.album.title + ' · ' : '') + (cur + 1) + ' / ' + items.length;
+      lbImg.alt = p.caption || it.project.title + ' ' + (cur + 1);
+      $('#lb-count').textContent = (withLink ? it.album.title + ' · ' + it.project.title + ' · ' : '') + (cur + 1) + ' / ' + items.length;
       $('#lb-cap').textContent = p.caption || '';
       var link = $('#lb-link');
-      if (link) { link.href = albumUrl(it.album); link.hidden = !withLink; }
+      if (link) { link.href = projectUrl(it.album, it.project); link.hidden = !withLink; }
       var next = new Image();
       next.src = items[(cur + 1) % items.length].p.src;
     }
@@ -119,16 +166,6 @@
   }
 
   /* ---------- Homepage ---------- */
-  function mixed(albums) {
-    // Foto di tutte le cartelle, alternate: una di Portrait, una di Travel, ...
-    var out = [], max = 0;
-    albums.forEach(function (a) { max = Math.max(max, (a.photos || []).length); });
-    for (var i = 0; i < max; i++) {
-      albums.forEach(function (a) { if (a.photos && a.photos[i]) out.push({ p: a.photos[i], album: a }); });
-    }
-    return out;
-  }
-
   function home(d) {
     var site = d.site, albums = d.albums;
     chrome(site, albums, null);
@@ -139,103 +176,111 @@
     intro.textContent = site.intro || '';
     intro.hidden = !site.intro;
 
-    var pp = site.profilePhoto;
-    var hero = $('#hero');
+    var pp = site.profilePhoto, hero = $('#hero');
     if (pp && pp.src) hero.innerHTML = '<img src="' + esc(pp.src) + '" alt="' + esc(site.name) + '" width="' + (pp.w || 960) + '" height="' + (pp.h || 1200) + '">';
     else hero.hidden = true;
 
-    /* Caselle con le foto mischiate */
-    var withPhotos = albums.filter(function (a) { return (a.photos || []).length; });
-    var filter = 'all';
-    var open = lightbox(true);
-    var chips = $('#chips');
+    /* Griglia con le foto mischiate */
+    var withPhotos = albums.filter(function (a) { return photoCount(a); });
+    var filter = 'all', current = [], open = lightbox(true), chips = $('#chips');
     chips.innerHTML = withPhotos.length > 1
       ? '<button type="button" class="chip" data-f="all" aria-pressed="true">All</button>' +
         withPhotos.map(function (a) {
           return '<button type="button" class="chip" data-f="' + esc(a.slug) + '" aria-pressed="false">' + esc(a.title) + '</button>';
         }).join('')
       : '';
-    var current = [];
-    function drawTiles() {
+    function draw() {
       current = (filter === 'all'
-        ? mixed(albums)
-        : (withPhotos.filter(function (a) { return a.slug === filter; })[0].photos || []).map(function (p) {
-            return { p: p, album: withPhotos.filter(function (a) { return a.slug === filter; })[0] };
-          })
+        ? interleave(albums.map(albumItems))
+        : albumItems(first(withPhotos, function (a) { return a.slug === filter; }))
       ).slice(0, HOME_MAX);
-      $('#mosaic').innerHTML = current.length ? current.map(function (it, i) {
-        // ogni foto mantiene il suo formato (verticale o orizzontale)
-        var w = it.p.tw || it.p.w || 4, h = it.p.th || it.p.h || 5;
-        var r = Math.max(0.4, Math.min(3, w / h)).toFixed(4);
-        return '<button type="button" class="tile" style="--r:' + r + '" data-i="' + i + '" aria-label="Open photo: ' + esc(it.album.title) + ' ' + (i + 1) + '">' +
-          '<i aria-hidden="true"></i>' +
-          img(it.p, it.p.caption || it.album.title, i < 4) + '<span class="lab">' + esc(it.album.title) + '</span></button>';
-      }).join('') : '';
+      $('#mosaic').innerHTML = tiles(current, true);
       $('#mosaic-empty').hidden = !!current.length;
       chips.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.f === filter)); });
     }
     chips.addEventListener('click', function (e) {
       var c = e.target.closest('.chip');
-      if (!c) return;
-      filter = c.dataset.f;
-      drawTiles();
+      if (c) { filter = c.dataset.f; draw(); }
     });
     $('#mosaic').addEventListener('click', function (e) {
       var b = e.target.closest('.tile');
       if (b) open(current, +b.dataset.i, b);
     });
-    drawTiles();
+    draw();
 
     /* Cartelle */
     $('#count').textContent = albums.length === 1 ? '1 collection' : albums.length + ' collections';
     $('#albums').innerHTML = albums.map(function (a) {
-      var c = coverOf(a), n = (a.photos || []).length;
+      var c = albumCover(a), n = a.projects.filter(function (p) { return p.photos.length; }).length;
       return '<a class="album-card" href="' + albumUrl(a) + '">' +
         '<div class="frame">' + (c ? img(c, a.title) : '') + '</div>' +
         '<div class="row"><span class="t">' + esc(a.title) + '</span>' +
-        '<span class="go">' + (n ? n + (n === 1 ? ' photo →' : ' photos →') : 'Coming soon') + '</span></div></a>';
+        '<span class="go">' + (n ? n + (n === 1 ? ' project →' : ' projects →') : 'Coming soon') + '</span></div></a>';
     }).join('');
   }
 
-  /* ---------- Pagina cartella ---------- */
+  /* ---------- Cartella (copertine dei progetti) e pagina progetto ---------- */
   function album(d) {
     var site = d.site, albums = d.albums;
-    var slug = new URLSearchParams(location.search).get('a');
-    var a = albums.filter(function (x) { return x.slug === slug; })[0];
-    chrome(site, albums, slug);
+    var q = new URLSearchParams(location.search);
+    var a = first(albums, function (x) { return x.slug === q.get('a'); });
+    chrome(site, albums, a ? a.slug : null);
     if (!a) {
       $('#album').innerHTML = '<p class="empty">Collection not found. <a href="./">Back to home</a></p>';
       return;
     }
-    document.title = a.title + ' — ' + site.name;
-    $('#atitle').textContent = a.title;
-    var desc = $('#adesc');
-    desc.textContent = a.description || '';
-    desc.hidden = !a.description;
-    var ph = a.photos || [];
-    $('#acount').textContent = ph.length === 1 ? '1 photo' : ph.length + ' photos';
+    var visible = a.projects.filter(function (p) { return p.photos.length; });
+    var pr = q.get('p') ? first(a.projects, function (x) { return x.slug === q.get('p'); }) : null;
+    var grid = $('#grid');
 
-    $('#share').addEventListener('click', function () {
-      var url = location.href;
-      if (navigator.share) {
-        navigator.share({ title: a.title + ' — ' + site.name, url: url }).catch(function () {});
-      } else if (navigator.clipboard) {
-        navigator.clipboard.writeText(url).then(function () { toast('Link copied'); });
-      }
-    });
-
-    if (!ph.length) {
-      $('#grid').outerHTML = '<p class="empty">Photos coming soon.</p>';
+    if (q.get('p') && !pr) {
+      $('#album').innerHTML = '<p class="empty">Project not found. <a href="' + albumUrl(a) + '">Back to ' + esc(a.title) + '</a></p>';
       return;
     }
-    var items = ph.map(function (p) { return { p: p, album: a }; });
-    $('#grid').innerHTML = ph.map(function (p, i) {
-      return '<button type="button" data-i="' + i + '" aria-label="Open photo ' + (i + 1) + ' of ' + ph.length + '">' +
-        img(p, p.caption || a.title + ' ' + (i + 1), i < 3) + '</button>';
-    }).join('');
+
+    if (!pr) {
+      /* Copertine dei progetti */
+      document.title = a.title + ' — ' + site.name;
+      $('#back').href = './';
+      $('#back').textContent = '← All work';
+      $('#atitle').textContent = a.title;
+      var desc = $('#adesc');
+      desc.textContent = a.description || '';
+      desc.hidden = !a.description;
+      $('#acount').textContent = visible.length === 1 ? '1 project' : visible.length + ' projects';
+      $('#share').textContent = 'Share this collection';
+      $('#share').addEventListener('click', function () { share(a.title + ' — ' + site.name, 'Link copied'); });
+      if (!visible.length) { grid.outerHTML = '<p class="empty">Projects coming soon.</p>'; return; }
+      grid.className = 'album-grid projects';
+      grid.innerHTML = visible.map(function (p) {
+        var c = projectCover(p), n = p.photos.length;
+        return '<a class="album-card" href="' + projectUrl(a, p) + '">' +
+          '<div class="frame">' + img(c, p.title) + '</div>' +
+          '<div class="row"><span class="t">' + esc(p.title) + '</span><span class="go">' + n + (n === 1 ? ' photo →' : ' photos →') + '</span></div>' +
+          (p.year ? '<span class="meta card-year">' + esc(p.year) + '</span>' : '') + '</a>';
+      }).join('');
+      return;
+    }
+
+    /* Pagina del progetto */
+    document.title = pr.title + ' — ' + a.title + ' — ' + site.name;
+    $('#back').href = albumUrl(a);
+    $('#back').textContent = '← ' + a.title;
+    $('#atitle').textContent = pr.title;
+    var pdesc = $('#adesc');
+    pdesc.textContent = pr.description || '';
+    pdesc.hidden = !pr.description;
+    var n = pr.photos.length;
+    $('#acount').textContent = (pr.year ? pr.year + ' · ' : '') + (n === 1 ? '1 photo' : n + ' photos');
+    $('#share').textContent = 'Share this project';
+    $('#share').addEventListener('click', function () { share(pr.title + ' — ' + site.name, 'Link copied'); });
+    if (!n) { grid.outerHTML = '<p class="empty">Photos coming soon.</p>'; return; }
+    var items = pr.photos.map(function (p) { return { p: p, album: a, project: pr }; });
+    grid.className = 'mosaic project-grid';
+    grid.innerHTML = tiles(items, false);
     var open = lightbox(false);
-    $('#grid').addEventListener('click', function (e) {
-      var b = e.target.closest('button[data-i]');
+    grid.addEventListener('click', function (e) {
+      var b = e.target.closest('.tile');
       if (b) open(items, +b.dataset.i, b);
     });
   }

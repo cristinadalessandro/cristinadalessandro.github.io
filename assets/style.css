@@ -78,6 +78,9 @@ img { display: block; max-width: 100%; }
 .album-card .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .album-card .t { font-family: var(--serif); font-size: 32px; line-height: 1.1; }
 .album-card .go { font-size: 13px; color: var(--muted); }
+.album-grid.projects { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.card-year { margin-top: -8px; }
+.project-grid { padding-bottom: 96px; }
 
 /* Piè di pagina */
 .footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; padding: 32px 0 48px; border-top: 1px solid var(--line); font-size: 13px; color: var(--soft); }
