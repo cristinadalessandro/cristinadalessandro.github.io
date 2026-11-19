@@ -2,7 +2,6 @@
   'use strict';
 
   var $ = function (s) { return document.querySelector(s); };
-  var HOME_MAX = 24; // foto mostrate nella griglia della homepage
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -185,8 +184,10 @@
     if (pp && pp.src) hero.innerHTML = '<img src="' + esc(pp.src) + '" alt="' + esc(site.name) + '" width="' + (pp.w || 960) + '" height="' + (pp.h || 1200) + '">';
     else hero.hidden = true;
 
-    /* Griglia con le foto mischiate */
-    var withPhotos = albums.filter(function (a) { return photoCount(a); });
+    /* Griglia con le foto scelte per la homepage */
+    function featured(a) { return albumItems(a).filter(function (it) { return it.p.featured; }); }
+    var withPhotos = albums.filter(function (a) { return featured(a).length; });
+    if (!withPhotos.length) { $('.selection').hidden = true; }
     var filter = 'all', current = [], open = lightbox(true), chips = $('#chips');
     chips.innerHTML = withPhotos.length > 1
       ? '<button type="button" class="chip" data-f="all" aria-pressed="true">All</button>' +
@@ -195,10 +196,9 @@
         }).join('')
       : '';
     function draw() {
-      current = (filter === 'all'
-        ? interleave(albums.map(albumItems))
-        : albumItems(first(withPhotos, function (a) { return a.slug === filter; }))
-      ).slice(0, HOME_MAX);
+      current = filter === 'all'
+        ? interleave(albums.map(featured))
+        : featured(first(withPhotos, function (a) { return a.slug === filter; }));
       $('#mosaic').innerHTML = tiles(current, true);
       $('#mosaic-empty').hidden = !!current.length;
       chips.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.f === filter)); });

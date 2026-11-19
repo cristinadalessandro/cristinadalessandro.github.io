@@ -293,7 +293,12 @@
           delBtn('album:' + a.slug, 'del-album', ' data-slug="' + esc(a.slug) + '"', 'Elimina cartella') +
         '</div></div>';
     }).join('');
+    var nFeat = 0;
+    data.albums.forEach(function (a) { a.projects.forEach(function (pr) { pr.photos.forEach(function (p) { if (p.featured) nFeat++; }); }); });
     $('#view').innerHTML =
+      '<p class="hint" style="margin:0 0 24px;padding:14px 16px;border:1px solid var(--line)">' +
+        '<strong>Homepage:</strong> ' + (nFeat ? nFeat + (nFeat === 1 ? ' foto scelta' : ' foto scelte') : 'nessuna foto scelta, la griglia in homepage è nascosta') +
+        '. Per sceglierle apri un progetto e tocca "☆ Metti in homepage" sulle foto che vuoi mostrare.</p>' +
       '<div class="section-head"><h1 class="h2">Cartelle</h1><span class="meta">L\'ordine qui è l\'ordine sul sito</span></div>' +
       '<div class="card-list">' + (rows || '<p class="hint">Nessuna cartella. Creane una qui sotto.</p>') + '</div>' +
       '<form class="new-album" id="new-album"><input type="text" id="new-title" placeholder="Nome della nuova cartella (es. Fashion)" aria-label="Nome della nuova cartella" required>' +
@@ -344,7 +349,10 @@
       var isCover = projectCover(pr) === p;
       return '<div class="ph">' +
         '<div class="img"><img src="' + esc(previewUrl(p.thumb)) + '" alt="Foto ' + (i + 1) + '" loading="lazy">' +
-          (isCover ? '<span class="badge">Copertina</span>' : '') + '</div>' +
+          (isCover ? '<span class="badge">Copertina</span>' : '') +
+          (p.featured ? '<span class="badge' + (isCover ? ' b2' : '') + '">★ In homepage</span>' : '') + '</div>' +
+        '<button type="button" class="btn sm' + (p.featured ? '' : ' ghost') + '" data-act="ph-feature" data-i="' + i + '" aria-pressed="' + (p.featured ? 'true' : 'false') + '">' +
+          (p.featured ? '★ In homepage · togli' : '☆ Metti in homepage') + '</button>' +
         '<input type="text" data-cap="' + i + '" value="' + esc(p.caption || '') + '" placeholder="Didascalia (facoltativa)" aria-label="Didascalia foto ' + (i + 1) + '">' +
         '<div class="acts">' +
           '<button type="button" class="btn ghost sm" data-act="ph-left" data-i="' + i + '" aria-label="Sposta prima"' + (i === 0 ? ' disabled' : '') + '>←</button>' +
@@ -554,6 +562,7 @@
       case 'ph-left': case 'ph-right':
         move(pr.photos, i, act === 'ph-left' ? -1 : 1); markDirty(); render(); return;
       case 'ph-cover': pr.cover = p.src; markDirty(); render(); return;
+      case 'ph-feature': p.featured = !p.featured; if (!p.featured) delete p.featured; markDirty(); render(); return;
       case 'ph-del':
         if (!confirmTwice('photo:' + p.src)) return;
         dropPhoto(pr, p); markDirty(); render(); return;
