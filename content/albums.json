@@ -1,0 +1,18 @@
+{
+  "albums": [
+    {
+      "slug": "portrait",
+      "title": "Portrait",
+      "description": "",
+      "cover": "",
+      "photos": []
+    },
+    {
+      "slug": "travel",
+      "title": "Travel",
+      "description": "",
+      "cover": "",
+      "photos": []
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cristina D'Alessandro — Portfolio</title>
+<meta name="description" content="Portfolio di Cristina D'Alessandro: fotografia editoriale.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="album">
+<div class="wrap">
+  <header class="top">
+    <a class="brand" id="brand" href="./">Cristina D'Alessandro</a>
+    <nav class="nav" id="nav" aria-label="Menu principale"></nav>
+  </header>
+
+  <main id="album">
+    <div class="album-head">
+      <a class="back" href="./">← Tutti i lavori</a>
+      <h1 class="album-title" id="atitle"></h1>
+      <p class="album-desc" id="adesc" hidden></p>
+      <div class="album-tools">
+        <span class="meta" id="acount"></span>
+        <button type="button" class="btn-line" id="share">Condividi questa cartella</button>
+      </div>
+    </div>
+    <div class="masonry" id="grid"></div>
+  </main>
+
+  <footer class="footer" id="footer"></footer>
+</div>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Foto a schermo intero">
+  <div class="lb-bar">
+    <span id="lb-count"></span>
+    <button type="button" class="lb-btn" id="lb-close">Chiudi ✕</button>
+  </div>
+  <div class="lb-stage" id="lb-stage">
+    <button type="button" class="lb-btn lb-prev" id="lb-prev" aria-label="Foto precedente">←</button>
+    <img id="lb-img" alt="">
+    <button type="button" class="lb-btn lb-next" id="lb-next" aria-label="Foto successiva">→</button>
+  </div>
+  <p class="lb-cap" id="lb-cap"></p>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
