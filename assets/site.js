@@ -164,7 +164,11 @@
           })
       ).slice(0, HOME_MAX);
       $('#mosaic').innerHTML = current.length ? current.map(function (it, i) {
-        return '<button type="button" class="tile" data-i="' + i + '" aria-label="Apri foto: ' + esc(it.album.title) + ' ' + (i + 1) + '">' +
+        // ogni foto mantiene il suo formato (verticale o orizzontale)
+        var w = it.p.tw || it.p.w || 4, h = it.p.th || it.p.h || 5;
+        var r = Math.max(0.4, Math.min(3, w / h)).toFixed(4);
+        return '<button type="button" class="tile" style="--r:' + r + '" data-i="' + i + '" aria-label="Apri foto: ' + esc(it.album.title) + ' ' + (i + 1) + '">' +
+          '<i aria-hidden="true"></i>' +
           img(it.p, it.p.caption || it.album.title, i < 4) + '<span class="lab">' + esc(it.album.title) + '</span></button>';
       }).join('') : '';
       $('#mosaic-empty').hidden = !!current.length;
