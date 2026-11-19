@@ -7,15 +7,15 @@
       "cover": "",
       "projects": [
         {
-          "slug": "untitled",
-          "title": "Untitled",
-          "year": "",
-          "description": "",
-          "cover": "",
+          "slug": "amber",
+          "title": "Amber",
+          "year": "2026",
+          "description": "A studio portrait project exploring masculinity through a cinematic visual language. Warm tones, subtle expressions and an intimate atmosphere come together to create a series that moves between strength, vulnerability and character.",
+          "cover": "photos/portrait/amber/mwnz16ylsiit2.jpg",
           "photos": [
             {
-              "src": "photos/portrait/mwnxu3pxxaeh2.jpg",
-              "thumb": "photos/portrait/mwnxu3pxxaeh2_t.jpg",
+              "src": "photos/portrait/amber/mwnz13njto4bx.jpg",
+              "thumb": "photos/portrait/amber/mwnz13njto4bx_t.jpg",
               "w": 1600,
               "h": 2400,
               "tw": 600,
@@ -24,8 +24,28 @@
               "caption": ""
             },
             {
-              "src": "photos/portrait/mwnxu4aeanyao.jpg",
-              "thumb": "photos/portrait/mwnxu4aeanyao_t.jpg",
+              "src": "photos/portrait/amber/mwnz16a16qirm.jpg",
+              "thumb": "photos/portrait/amber/mwnz16a16qirm_t.jpg",
+              "w": 1600,
+              "h": 2400,
+              "tw": 600,
+              "th": 900,
+              "bytes": 169324,
+              "caption": ""
+            },
+            {
+              "src": "photos/portrait/amber/mwnz14vjx7axo.jpg",
+              "thumb": "photos/portrait/amber/mwnz14vjx7axo_t.jpg",
+              "w": 1600,
+              "h": 2400,
+              "tw": 600,
+              "th": 900,
+              "bytes": 408327,
+              "caption": ""
+            },
+            {
+              "src": "photos/portrait/amber/mwnz16pbue4x1.jpg",
+              "thumb": "photos/portrait/amber/mwnz16pbue4x1_t.jpg",
               "w": 1600,
               "h": 2400,
               "tw": 600,
@@ -34,43 +54,63 @@
               "caption": ""
             },
             {
-              "src": "photos/portrait/mwnxu5b4q7698.jpg",
-              "thumb": "photos/portrait/mwnxu5b4q7698_t.jpg",
+              "src": "photos/portrait/amber/mwnz14dwm3l5r.jpg",
+              "thumb": "photos/portrait/amber/mwnz14dwm3l5r_t.jpg",
               "w": 1600,
               "h": 2400,
               "tw": 600,
               "th": 900,
-              "bytes": 639459,
+              "bytes": 343573,
               "caption": ""
             },
             {
-              "src": "photos/portrait/mwnxu5kblslhy.jpg",
-              "thumb": "photos/portrait/mwnxu5kblslhy_t.jpg",
+              "src": "photos/portrait/amber/mwnz16ylsiit2.jpg",
+              "thumb": "photos/portrait/amber/mwnz16ylsiit2_t.jpg",
               "w": 1600,
               "h": 2400,
               "tw": 600,
               "th": 900,
-              "bytes": 545395,
+              "bytes": 227607,
               "caption": ""
             },
             {
-              "src": "photos/portrait/mwnxu5tfqhekd.jpg",
-              "thumb": "photos/portrait/mwnxu5tfqhekd_t.jpg",
+              "src": "photos/portrait/amber/mwnz12n2u38y5.jpg",
+              "thumb": "photos/portrait/amber/mwnz12n2u38y5_t.jpg",
               "w": 1600,
               "h": 2400,
               "tw": 600,
               "th": 900,
-              "bytes": 454775,
+              "bytes": 331443,
               "caption": ""
             },
             {
-              "src": "photos/portrait/mwnxu61x6ynvs.jpg",
-              "thumb": "photos/portrait/mwnxu61x6ynvs_t.jpg",
+              "src": "photos/portrait/amber/mwnz17c2gkq9u.jpg",
+              "thumb": "photos/portrait/amber/mwnz17c2gkq9u_t.jpg",
               "w": 1600,
               "h": 2400,
               "tw": 600,
               "th": 900,
-              "bytes": 635891,
+              "bytes": 192064,
+              "caption": ""
+            },
+            {
+              "src": "photos/portrait/amber/mwnz15ayhf5dl.jpg",
+              "thumb": "photos/portrait/amber/mwnz15ayhf5dl_t.jpg",
+              "w": 1600,
+              "h": 2400,
+              "tw": 600,
+              "th": 900,
+              "bytes": 371811,
+              "caption": ""
+            },
+            {
+              "src": "photos/portrait/amber/mwnz16hve9zwc.jpg",
+              "thumb": "photos/portrait/amber/mwnz16hve9zwc_t.jpg",
+              "w": 1600,
+              "h": 2400,
+              "tw": 600,
+              "th": 900,
+              "bytes": 190746,
               "caption": ""
             }
           ]
