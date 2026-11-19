@@ -73,7 +73,28 @@
       "title": "Travel",
       "description": "",
       "cover": "",
-      "photos": []
+      "photos": [
+        {
+          "src": "photos/travel/mwnxvk789l3vc.jpg",
+          "thumb": "photos/travel/mwnxvk789l3vc_t.jpg",
+          "w": 2400,
+          "h": 1600,
+          "tw": 900,
+          "th": 600,
+          "bytes": 826828,
+          "caption": ""
+        },
+        {
+          "src": "photos/travel/mwnxvkgg1zpgs.jpg",
+          "thumb": "photos/travel/mwnxvkgg1zpgs_t.jpg",
+          "w": 2400,
+          "h": 1600,
+          "tw": 900,
+          "th": 600,
+          "bytes": 630794,
+          "caption": ""
+        }
+      ]
     }
   ]
 }
