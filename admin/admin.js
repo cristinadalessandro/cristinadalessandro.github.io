@@ -279,19 +279,19 @@
         '<p class="hint" id="pp-msg">Se non c\'è nessuna foto, in homepage resta solo il nome.</p></div>' +
       '<div class="two">' +
         f('name', 'Nome') +
-        f('tagline', 'Sottotitolo in homepage', 'text', 'Es. "Fotografia editoriale".') +
+        f('tagline', 'Sottotitolo in homepage', 'text', 'In inglese, es. "Editorial photography".') +
       '</div>' +
       '<div class="field"><label for="t-intro">Frase breve in homepage (facoltativa)</label>' +
         '<input type="text" id="t-intro" data-field="intro" value="' + esc(site.intro || '') + '"></div>' +
       '<div class="field"><label for="t-bio">Biografia</label>' +
         '<textarea id="t-bio" data-field="bio" style="min-height:260px">' + esc(site.bio || '') + '</textarea>' +
-        '<p class="hint">Lascia una riga vuota per iniziare un nuovo paragrafo.</p></div>' +
+        '<p class="hint">Il sito è in inglese: scrivi la bio in inglese. Lascia una riga vuota per iniziare un nuovo paragrafo.</p></div>' +
       '<div class="section-head" style="margin-top:40px"><h2 class="h2" style="font-size:32px">Contatti</h2><span class="meta">I campi vuoti non compaiono sul sito</span></div>' +
       '<div class="two">' +
         f('email', 'Email', 'email') +
         f('instagram', 'Instagram', 'text', 'Solo il nome utente, es. @cristina.photo') +
         f('phone', 'Telefono / WhatsApp', 'tel') +
-        f('city', 'Città', 'text', 'Es. "Palermo · disponibile per trasferte"') +
+        f('city', 'Città', 'text', 'In inglese, es. "Palermo, Italy · available for travel"') +
       '</div>';
     $('#pp-file').addEventListener('change', function (e) {
       var file = e.target.files && e.target.files[0];

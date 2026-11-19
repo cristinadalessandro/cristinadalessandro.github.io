@@ -46,7 +46,7 @@
       return '<a href="' + albumUrl(a) + '"' + (current === a.slug ? ' aria-current="page"' : '') + '>' + esc(a.title) + '</a>';
     }).join('');
     html += '<a href="about.html"' + (current === 'about' ? ' aria-current="page"' : '') + '>About</a>';
-    html += '<a href="about.html#contatti">Contatti</a>';
+    html += '<a href="about.html#contact">Contact</a>';
     $('#nav').innerHTML = html;
 
     var parts = [];
@@ -132,7 +132,7 @@
   function home(d) {
     var site = d.site, albums = d.albums;
     chrome(site, albums, null);
-    document.title = site.name + ' — ' + (site.tagline || 'Fotografia');
+    document.title = site.name + ' — ' + (site.tagline || 'Photography');
     $('#tagline').textContent = site.tagline || '';
     $('#name').innerHTML = nameHtml(site.name);
     var intro = $('#intro');
@@ -150,7 +150,7 @@
     var open = lightbox(true);
     var chips = $('#chips');
     chips.innerHTML = withPhotos.length > 1
-      ? '<button type="button" class="chip" data-f="all" aria-pressed="true">Tutte</button>' +
+      ? '<button type="button" class="chip" data-f="all" aria-pressed="true">All</button>' +
         withPhotos.map(function (a) {
           return '<button type="button" class="chip" data-f="' + esc(a.slug) + '" aria-pressed="false">' + esc(a.title) + '</button>';
         }).join('')
@@ -167,7 +167,7 @@
         // ogni foto mantiene il suo formato (verticale o orizzontale)
         var w = it.p.tw || it.p.w || 4, h = it.p.th || it.p.h || 5;
         var r = Math.max(0.4, Math.min(3, w / h)).toFixed(4);
-        return '<button type="button" class="tile" style="--r:' + r + '" data-i="' + i + '" aria-label="Apri foto: ' + esc(it.album.title) + ' ' + (i + 1) + '">' +
+        return '<button type="button" class="tile" style="--r:' + r + '" data-i="' + i + '" aria-label="Open photo: ' + esc(it.album.title) + ' ' + (i + 1) + '">' +
           '<i aria-hidden="true"></i>' +
           img(it.p, it.p.caption || it.album.title, i < 4) + '<span class="lab">' + esc(it.album.title) + '</span></button>';
       }).join('') : '';
@@ -187,13 +187,13 @@
     drawTiles();
 
     /* Cartelle */
-    $('#count').textContent = albums.length === 1 ? '1 cartella' : albums.length + ' cartelle';
+    $('#count').textContent = albums.length === 1 ? '1 collection' : albums.length + ' collections';
     $('#albums').innerHTML = albums.map(function (a) {
       var c = coverOf(a), n = (a.photos || []).length;
       return '<a class="album-card" href="' + albumUrl(a) + '">' +
         '<div class="frame">' + (c ? img(c, a.title) : '') + '</div>' +
         '<div class="row"><span class="t">' + esc(a.title) + '</span>' +
-        '<span class="go">' + (n ? n + ' foto →' : 'In arrivo') + '</span></div></a>';
+        '<span class="go">' + (n ? n + (n === 1 ? ' photo →' : ' photos →') : 'Coming soon') + '</span></div></a>';
     }).join('');
   }
 
@@ -204,7 +204,7 @@
     var a = albums.filter(function (x) { return x.slug === slug; })[0];
     chrome(site, albums, slug);
     if (!a) {
-      $('#album').innerHTML = '<p class="empty">Cartella non trovata. <a href="./">Torna alla home</a></p>';
+      $('#album').innerHTML = '<p class="empty">Collection not found. <a href="./">Back to home</a></p>';
       return;
     }
     document.title = a.title + ' — ' + site.name;
@@ -213,24 +213,24 @@
     desc.textContent = a.description || '';
     desc.hidden = !a.description;
     var ph = a.photos || [];
-    $('#acount').textContent = ph.length === 1 ? '1 foto' : ph.length + ' foto';
+    $('#acount').textContent = ph.length === 1 ? '1 photo' : ph.length + ' photos';
 
     $('#share').addEventListener('click', function () {
       var url = location.href;
       if (navigator.share) {
         navigator.share({ title: a.title + ' — ' + site.name, url: url }).catch(function () {});
       } else if (navigator.clipboard) {
-        navigator.clipboard.writeText(url).then(function () { toast('Link della cartella copiato'); });
+        navigator.clipboard.writeText(url).then(function () { toast('Link copied'); });
       }
     });
 
     if (!ph.length) {
-      $('#grid').outerHTML = '<p class="empty">Le foto di questa cartella sono in arrivo.</p>';
+      $('#grid').outerHTML = '<p class="empty">Photos coming soon.</p>';
       return;
     }
     var items = ph.map(function (p) { return { p: p, album: a }; });
     $('#grid').innerHTML = ph.map(function (p, i) {
-      return '<button type="button" data-i="' + i + '" aria-label="Apri foto ' + (i + 1) + ' di ' + ph.length + '">' +
+      return '<button type="button" data-i="' + i + '" aria-label="Open photo ' + (i + 1) + ' of ' + ph.length + '">' +
         img(p, p.caption || a.title + ' ' + (i + 1), i < 3) + '</button>';
     }).join('');
     var open = lightbox(false);
@@ -255,17 +255,17 @@
       var h = site.instagram.replace(/^@/, '').trim();
       rows.push(['Instagram', '<a href="https://instagram.com/' + encodeURIComponent(h) + '" target="_blank" rel="noopener">@' + esc(h) + '</a>']);
     }
-    if (site.phone) rows.push(['Telefono', '<a href="tel:' + esc(site.phone.replace(/[^\d+]/g, '')) + '">' + esc(site.phone) + '</a>']);
-    if (site.city) rows.push(['Base', esc(site.city)]);
+    if (site.phone) rows.push(['Phone', '<a href="tel:' + esc(site.phone.replace(/[^\d+]/g, '')) + '">' + esc(site.phone) + '</a>']);
+    if (site.city) rows.push(['Based in', esc(site.city)]);
     $('#contacts').innerHTML = rows.length
       ? rows.map(function (r) { return '<li><span class="k">' + r[0] + '</span><span>' + r[1] + '</span></li>'; }).join('')
-      : '<li><span class="k">In arrivo</span></li>';
-    if (location.hash === '#contatti') $('#contatti').scrollIntoView();
+      : '<li><span class="k">Coming soon</span></li>';
+    if (location.hash === '#contact') $('#contact').scrollIntoView();
   }
 
   var pages = { home: home, album: album, about: about };
   load().then(function (d) { pages[document.body.dataset.page](d); }).catch(function () {
     var m = document.querySelector('main');
-    if (m) m.insertAdjacentHTML('afterbegin', '<p class="empty">Impossibile caricare i contenuti. Ricarica la pagina.</p>');
+    if (m) m.insertAdjacentHTML('afterbegin', '<p class="empty">Could not load the content. Please refresh the page.</p>');
   });
 })();
