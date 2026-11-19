@@ -7,5 +7,11 @@
   "city": "",
   "email": "",
   "instagram": "@cristinadale_",
-  "phone": ""
+  "phone": "",
+  "profilePhoto": {
+    "src": "photos/profilo/mwnzya02.jpg",
+    "w": 994,
+    "h": 1200,
+    "bytes": 196499
+  }
 }
