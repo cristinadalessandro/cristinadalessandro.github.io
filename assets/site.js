@@ -124,10 +124,15 @@
       var it = items[cur], p = it.p;
       lbImg.src = p.src;
       lbImg.alt = p.caption || it.project.title + ' ' + (cur + 1);
-      $('#lb-count').textContent = (withLink ? it.album.title + ' · ' + it.project.title + ' · ' : '') + (cur + 1) + ' / ' + items.length;
+      var gallery = it.album.mode === 'photos';
+      $('#lb-count').textContent = (withLink ? it.album.title + (gallery ? '' : ' · ' + it.project.title) + ' · ' : '') + (cur + 1) + ' / ' + items.length;
       $('#lb-cap').textContent = p.caption || '';
       var link = $('#lb-link');
-      if (link) { link.href = projectUrl(it.album, it.project); link.hidden = !withLink; }
+      if (link) {
+        link.href = gallery ? albumUrl(it.album) : projectUrl(it.album, it.project);
+        link.textContent = gallery ? 'View ' + it.album.title + ' →' : 'View project →';
+        link.hidden = !withLink;
+      }
       var next = new Image();
       next.src = items[(cur + 1) % items.length].p.src;
     }
@@ -211,11 +216,18 @@
     /* Cartelle */
     $('#count').textContent = albums.length === 1 ? '1 collection' : albums.length + ' collections';
     $('#albums').innerHTML = albums.map(function (a) {
-      var c = albumCover(a), n = a.projects.filter(function (p) { return p.photos.length; }).length;
+      var c = albumCover(a), label;
+      if (a.mode === 'photos') {
+        var nf = photoCount(a);
+        label = nf ? nf + (nf === 1 ? ' photo →' : ' photos →') : 'Coming soon';
+      } else {
+        var n = a.projects.filter(function (p) { return p.photos.length; }).length;
+        label = n ? n + (n === 1 ? ' project →' : ' projects →') : 'Coming soon';
+      }
       return '<a class="album-card" href="' + albumUrl(a) + '">' +
         '<div class="frame">' + (c ? img(c, a.title) : '') + '</div>' +
         '<div class="row"><span class="t">' + esc(a.title) + '</span>' +
-        '<span class="go">' + (n ? n + (n === 1 ? ' project →' : ' projects →') : 'Coming soon') + '</span></div></a>';
+        '<span class="go">' + label + '</span></div></a>';
     }).join('');
   }
 
@@ -229,9 +241,33 @@
       $('#album').innerHTML = '<p class="empty">Collection not found. <a href="./">Back to home</a></p>';
       return;
     }
+    var grid = $('#grid');
+
+    if (a.mode === 'photos') {
+      /* Galleria unica, senza progetti */
+      document.title = a.title + ' — ' + site.name;
+      $('#atitle').textContent = a.title;
+      var gdesc = $('#adesc');
+      gdesc.textContent = a.description || '';
+      gdesc.hidden = !a.description;
+      var gitems = [];
+      a.projects.forEach(function (pr) { pr.photos.forEach(function (p) { gitems.push({ p: p, album: a, project: pr }); }); });
+      $('#acount').textContent = gitems.length === 1 ? '1 photo' : gitems.length + ' photos';
+      $('#share').textContent = 'Share this collection';
+      $('#share').addEventListener('click', function () { share(a.title + ' — ' + site.name, 'Link copied'); });
+      if (!gitems.length) { grid.outerHTML = '<p class="empty">Photos coming soon.</p>'; return; }
+      grid.className = 'mosaic wide project-grid';
+      grid.innerHTML = tiles(gitems, false);
+      var gopen = lightbox(false);
+      grid.addEventListener('click', function (e) {
+        var b = e.target.closest('.tile');
+        if (b) gopen(gitems, +b.dataset.i, b);
+      });
+      return;
+    }
+
     var visible = a.projects.filter(function (p) { return p.photos.length; });
     var pr = q.get('p') ? first(a.projects, function (x) { return x.slug === q.get('p'); }) : null;
-    var grid = $('#grid');
 
     if (q.get('p') && !pr) {
       $('#album').innerHTML = '<p class="empty">Project not found. <a href="' + albumUrl(a) + '">Back to ' + esc(a.title) + '</a></p>';

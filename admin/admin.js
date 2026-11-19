@@ -94,6 +94,8 @@
         a.cover = '';
       }
       if (a.coverProject == null) a.coverProject = '';
+      if (a.mode !== 'photos') a.mode = 'projects';
+      if (a.mode === 'photos') ensureGallery(a);
       a.projects.forEach(function (p) { if (!Array.isArray(p.photos)) p.photos = []; });
     });
   }
@@ -204,6 +206,22 @@
              first(a.projects, function (x) { return x.photos.length; });
     return pr ? projectCover(pr) : null;
   }
+  // Cartella in modalità "solo foto": un unico progetto interno che contiene tutte le foto
+  function ensureGallery(a) {
+    if (!a.projects.length) a.projects.push({ slug: 'photos', title: a.title, year: '', description: '', cover: '', photos: [] });
+    if (a.projects.length > 1) {
+      var keep = a.projects[0];
+      a.projects.slice(1).forEach(function (p) { keep.photos = keep.photos.concat(p.photos); });
+      a.projects = [keep];
+    }
+    a.coverProject = '';
+    return a.projects[0];
+  }
+  function currentProject(a) {
+    if (!a) return null;
+    if (a.mode === 'photos') return a.projects[0] || null;
+    return view.project ? findProject(a, view.project) : null;
+  }
   function photoCount(a) { return a.projects.reduce(function (n, p) { return n + p.photos.length; }, 0); }
   function slugify(t) {
     return t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -255,9 +273,10 @@
     if (view.tab === 'texts') return renderTexts();
     var a = view.album && findAlbum(view.album);
     if (!a) { view.album = view.project = null; return renderAlbums(); }
+    if (a.mode === 'photos') { view.project = null; return renderProject(a, ensureGallery(a), true); }
     var pr = view.project && findProject(a, view.project);
     if (!pr) { view.project = null; return renderAlbum(a); }
-    renderProject(a, pr);
+    renderProject(a, pr, false);
   }
 
   /* Livello 1: cartelle */
@@ -266,7 +285,7 @@
       var np = a.projects.length, nf = photoCount(a);
       return '<div class="a-row">' + thumbBox(albumCover(a)) +
         '<div class="info"><div class="name">' + esc(a.title) + '</div><div class="hint">' +
-          np + (np === 1 ? ' progetto' : ' progetti') + ' · ' + nf + ' foto</div></div>' +
+          (a.mode === 'photos' ? 'Solo foto' : np + (np === 1 ? ' progetto' : ' progetti')) + ' · ' + nf + ' foto</div></div>' +
         '<div class="acts">' +
           '<button type="button" class="btn sm" data-act="open-album" data-slug="' + esc(a.slug) + '">Apri</button>' +
           '<button type="button" class="btn ghost sm" data-act="album-up" data-i="' + i + '" aria-label="Sposta ' + esc(a.title) + ' prima"' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
@@ -304,6 +323,7 @@
         '<div class="field"><label for="a-desc">Descrizione (facoltativa, in inglese)</label><input type="text" id="a-desc" value="' + esc(a.description || '') + '"></div>' +
       '</div>' +
       linkHint('album.html?a=' + encodeURIComponent(a.slug), 'Link di questa cartella') +
+      modeToggle(a) +
       '<div class="section-head" style="margin:32px 0 0"><h2 class="h2" style="font-size:32px">Progetti</h2><span class="meta">L\'ordine qui è l\'ordine sul sito</span></div>' +
       '<div class="card-list">' + (rows || '<p class="hint" style="padding:16px 0">Nessun progetto. Creane uno qui sotto.</p>') + '</div>' +
       '<form class="new-album" id="new-project" style="max-width:640px">' +
@@ -313,7 +333,13 @@
   }
 
   /* Livello 3: foto di un progetto */
-  function renderProject(a, pr) {
+  function modeToggle(a) {
+    return '<label class="check" style="margin:20px 0 0"><input type="checkbox" id="a-mode"' + (a.mode === 'photos' ? ' checked' : '') + '> ' +
+      'Solo foto, senza progetti (galleria unica, come Travel)</label>' +
+      (a.mode === 'photos' ? '' : '<p class="hint" style="margin:4px 0 0">Se la attivi, le foto di tutti i progetti di questa cartella vengono unite in un\'unica galleria.</p>');
+  }
+
+  function renderProject(a, pr, gallery) {
     var cards = pr.photos.map(function (p, i) {
       var isCover = projectCover(pr) === p;
       return '<div class="ph">' +
@@ -328,15 +354,23 @@
         '</div></div>';
     }).join('');
 
-    $('#view').innerHTML =
-      '<button type="button" class="back-btn" data-act="back-album">← ' + esc(a.title) + '</button>' +
-      '<div class="two" style="margin-top: 12px">' +
-        '<div class="field"><label for="p-title">Titolo del progetto</label><input type="text" id="p-title" value="' + esc(pr.title) + '"></div>' +
-        '<div class="field"><label for="p-year">Anno</label><input type="text" id="p-year" value="' + esc(pr.year || '') + '"></div>' +
-      '</div>' +
-      '<div class="field"><label for="p-desc">Descrizione (facoltativa, in inglese)</label>' +
-        '<textarea id="p-desc" style="min-height:80px">' + esc(pr.description || '') + '</textarea></div>' +
-      linkHint('album.html?a=' + encodeURIComponent(a.slug) + '&p=' + encodeURIComponent(pr.slug), 'Link di questo progetto') +
+    var head = gallery
+      ? '<button type="button" class="back-btn" data-act="back-albums">← Tutte le cartelle</button>' +
+        '<div class="two" style="margin-top: 12px">' +
+          '<div class="field"><label for="a-title">Nome della cartella</label><input type="text" id="a-title" value="' + esc(a.title) + '"></div>' +
+          '<div class="field"><label for="a-desc">Descrizione (facoltativa, in inglese)</label><input type="text" id="a-desc" value="' + esc(a.description || '') + '"></div>' +
+        '</div>' +
+        linkHint('album.html?a=' + encodeURIComponent(a.slug), 'Link di questa cartella') +
+        modeToggle(a) + '<div style="height:24px"></div>'
+      : '<button type="button" class="back-btn" data-act="back-album">← ' + esc(a.title) + '</button>' +
+        '<div class="two" style="margin-top: 12px">' +
+          '<div class="field"><label for="p-title">Titolo del progetto</label><input type="text" id="p-title" value="' + esc(pr.title) + '"></div>' +
+          '<div class="field"><label for="p-year">Anno</label><input type="text" id="p-year" value="' + esc(pr.year || '') + '"></div>' +
+        '</div>' +
+        '<div class="field"><label for="p-desc">Descrizione (facoltativa, in inglese)</label>' +
+          '<textarea id="p-desc" style="min-height:80px">' + esc(pr.description || '') + '</textarea></div>' +
+        linkHint('album.html?a=' + encodeURIComponent(a.slug) + '&p=' + encodeURIComponent(pr.slug), 'Link di questo progetto');
+    $('#view').innerHTML = head +
       '<div class="drop" id="drop">' +
         '<p>Trascina qui le foto, oppure</p>' +
         '<label class="btn" style="display:inline-flex;align-items:center;margin:0;text-transform:none;letter-spacing:0;font-size:13px;color:#FFFFFF">Scegli le foto' +
@@ -344,7 +378,7 @@
         '<p class="hint" id="upmsg" style="margin-top:12px">Le foto vengono ridotte e ottimizzate in automatico.</p>' +
       '</div>' +
       '<div class="section-head" style="margin-bottom:24px"><h2 class="h2" style="font-size:32px">Foto</h2><span class="meta">' + pr.photos.length + ' foto</span></div>' +
-      (cards ? '<div class="photos">' + cards + '</div>' : '<p class="hint">Ancora nessuna foto in questo progetto.</p>');
+      (cards ? '<div class="photos">' + cards + '</div>' : '<p class="hint">Ancora nessuna foto qui.</p>');
 
     var drop = $('#drop');
     ['dragenter', 'dragover'].forEach(function (ev) {
@@ -460,7 +494,15 @@
     if (el.dataset.field) { site[el.dataset.field] = el.value; markDirty(); return; }
     var a = view.album && findAlbum(view.album);
     if (!a) return;
-    var pr = view.project && findProject(a, view.project);
+    var pr = currentProject(a);
+    if (el.id === 'a-mode') {
+      if (el.checked) { a.mode = 'photos'; ensureGallery(a); }
+      else {
+        a.mode = 'projects';
+        if (a.projects[0] && a.projects[0].slug === 'photos' && a.projects[0].title === a.title) a.projects[0].title = 'Untitled';
+      }
+      view.project = null; markDirty(); render(); return;
+    }
     if (el.id === 'a-title') { a.title = el.value; markDirty(); }
     else if (el.id === 'a-desc') { a.description = el.value; markDirty(); }
     else if (!pr) return;
@@ -475,7 +517,7 @@
     if (!b || b.disabled) return;
     var act = b.dataset.act, i = +b.dataset.i;
     var a = view.album && findAlbum(view.album);
-    var pr = a && view.project && findProject(a, view.project);
+    var pr = currentProject(a);
 
     switch (act) {
       case 'open-album': view.album = b.dataset.slug; view.project = null; render(); window.scrollTo(0, 0); return;

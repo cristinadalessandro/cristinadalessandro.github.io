@@ -76,7 +76,8 @@
           ]
         }
       ],
-      "coverProject": ""
+      "coverProject": "",
+      "mode": "projects"
     },
     {
       "slug": "travel",
@@ -85,8 +86,8 @@
       "cover": "",
       "projects": [
         {
-          "slug": "untitled",
-          "title": "Untitled",
+          "slug": "photos",
+          "title": "Travel",
           "year": "",
           "description": "",
           "cover": "",
@@ -114,7 +115,8 @@
           ]
         }
       ],
-      "coverProject": ""
+      "coverProject": "",
+      "mode": "photos"
     }
   ]
 }
