@@ -41,7 +41,8 @@
               "tw": 600,
               "th": 900,
               "bytes": 408327,
-              "caption": ""
+              "caption": "",
+              "featured": true
             },
             {
               "src": "photos/portrait/amber/mwnz16pbue4x1.jpg",
@@ -71,7 +72,8 @@
               "tw": 600,
               "th": 900,
               "bytes": 227607,
-              "caption": ""
+              "caption": "",
+              "featured": true
             },
             {
               "src": "photos/portrait/amber/mwnz12n2u38y5.jpg",
@@ -130,7 +132,8 @@
               "tw": 900,
               "th": 600,
               "bytes": 706474,
-              "caption": ""
+              "caption": "",
+              "featured": true
             },
             {
               "src": "photos/portrait/jane-austen/mwnz9e6aeqjzi.jpg",
@@ -190,7 +193,8 @@
               "tw": 600,
               "th": 900,
               "bytes": 411658,
-              "caption": ""
+              "caption": "",
+              "featured": true
             },
             {
               "src": "photos/portrait/jane-austen/mwnz9hg6efjw1.jpg",
@@ -220,7 +224,8 @@
               "tw": 600,
               "th": 900,
               "bytes": 528195,
-              "caption": ""
+              "caption": "",
+              "featured": true
             },
             {
               "src": "photos/portrait/jane-austen/mwnz9nmhobl0q.jpg",
@@ -290,7 +295,8 @@
               "tw": 900,
               "th": 600,
               "bytes": 627596,
-              "caption": ""
+              "caption": "",
+              "featured": true
             },
             {
               "src": "photos/portrait/jane-austen/mwnz9vgyq659a.jpg",
@@ -360,7 +366,8 @@
               "tw": 600,
               "th": 900,
               "bytes": 500364,
-              "caption": ""
+              "caption": "",
+              "featured": true
             }
           ]
         }
