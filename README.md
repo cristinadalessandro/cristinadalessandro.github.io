@@ -8,8 +8,8 @@ Area riservata: https://cristinadalessandro.github.io/admin/
 
 Da lì si possono:
 - creare, rinominare, riordinare ed eliminare le cartelle;
-- caricare foto (vengono ridotte e ottimizzate in automatico), riordinarle, eliminarle, scegliere copertina e foto principale;
-- modificare biografia e contatti.
+- caricare foto (vengono ridotte e ottimizzate in automatico), riordinarle, eliminarle, scegliere la copertina di ogni cartella;
+- modificare biografia, contatti e foto profilo della homepage.
 
 Le modifiche vanno online toccando **Salva e pubblica**; il sito si aggiorna entro 1-2 minuti.
 

@@ -30,9 +30,32 @@ img { display: block; max-width: 100%; }
 .kicker { margin: 0; font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); }
 .display { margin: 0; font-family: var(--serif); font-weight: 400; font-size: clamp(56px, 9vw, 104px); line-height: 0.95; letter-spacing: -0.01em; }
 .display em { font-style: italic; }
-.hero { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px; align-items: end; padding: 80px 0 96px; }
-.hero-text { display: flex; flex-direction: column; gap: 24px; }
+.hero { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 40px; padding: 72px 0 64px; }
+.hero-text { display: flex; flex-direction: column; gap: 24px; flex: 1 1 420px; min-width: 0; }
 .intro { margin: 0; max-width: 380px; color: var(--soft); }
+.portrait-frame { width: clamp(150px, 20vw, 240px); aspect-ratio: 4 / 5; background: var(--ph); overflow: hidden; flex: none; }
+.portrait-frame img { width: 100%; height: 100%; object-fit: cover; }
+@media (max-width: 640px) {
+  .hero { padding: 48px 0 40px; gap: 28px; }
+  .portrait-frame { width: 150px; }
+}
+
+/* Caselle con le foto mischiate */
+.selection { padding-bottom: 96px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.chips:empty { display: none; }
+.chip { font: inherit; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; padding: 8px 16px; min-height: 40px; border: 1px solid var(--line); background: #FFFFFF; color: var(--ink); cursor: pointer; }
+.chip:hover { border-color: var(--ink); }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #FFFFFF; }
+.mosaic { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 900px) { .mosaic { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .mosaic { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; } }
+.tile { position: relative; display: block; aspect-ratio: 1; padding: 0; border: 0; overflow: hidden; background: var(--ph); cursor: zoom-in; }
+.tile img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease, opacity 0.3s; }
+.tile:hover img { transform: scale(1.03); }
+.tile .lab { position: absolute; left: 8px; bottom: 8px; background: rgba(255, 255, 255, 0.94); color: var(--ink); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; padding: 4px 8px; opacity: 0; transition: opacity 0.25s; }
+.tile:hover .lab, .tile:focus-visible .lab { opacity: 1; }
+@media (hover: none) { .tile .lab { opacity: 1; font-size: 10px; } }
 .frame { aspect-ratio: 4 / 5; background: var(--ph); overflow: hidden; }
 .frame img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
 
@@ -71,6 +94,8 @@ img { display: block; max-width: 100%; }
 .lb-stage { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 0 76px 16px; }
 .lb-stage img { max-width: 100%; max-height: 100%; object-fit: contain; user-select: none; -webkit-user-drag: none; }
 .lb-cap { min-height: 40px; padding: 0 24px 20px; text-align: center; font-size: 14px; color: var(--soft); }
+.lb-right { display: flex; align-items: center; gap: 20px; }
+.lb-right a { color: var(--ink); border-bottom: 1px solid var(--line); }
 .lb-btn { font: inherit; font-size: 13px; letter-spacing: 0.08em; background: none; border: 0; color: var(--ink); min-width: 44px; min-height: 44px; cursor: pointer; }
 .lb-prev, .lb-next { position: absolute; top: 50%; transform: translateY(-50%); font-size: 30px; line-height: 1; }
 .lb-prev { left: 12px; }

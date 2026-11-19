@@ -26,7 +26,13 @@
         <h1 class="display" id="name"></h1>
         <p class="intro" id="intro" hidden></p>
       </div>
-      <div class="frame" id="hero"></div>
+      <div class="portrait-frame" id="hero"></div>
+    </section>
+
+    <section class="selection" aria-label="Selezione di foto">
+      <div class="chips" id="chips" aria-label="Filtra le foto"></div>
+      <div class="mosaic" id="mosaic"></div>
+      <p class="empty" id="mosaic-empty" hidden>Le foto arriveranno presto.</p>
     </section>
 
     <section aria-labelledby="lavori">
@@ -39,6 +45,22 @@
   </main>
 
   <footer class="footer" id="footer"></footer>
+</div>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Foto a schermo intero">
+  <div class="lb-bar">
+    <span id="lb-count"></span>
+    <span class="lb-right">
+      <a id="lb-link" href="./" hidden>Apri la cartella →</a>
+      <button type="button" class="lb-btn" id="lb-close">Chiudi ✕</button>
+    </span>
+  </div>
+  <div class="lb-stage" id="lb-stage">
+    <button type="button" class="lb-btn lb-prev" id="lb-prev" aria-label="Foto precedente">←</button>
+    <img id="lb-img" alt="">
+    <button type="button" class="lb-btn lb-next" id="lb-next" aria-label="Foto successiva">→</button>
+  </div>
+  <p class="lb-cap" id="lb-cap"></p>
 </div>
 <script src="assets/site.js"></script>
 </body>

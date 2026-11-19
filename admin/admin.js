@@ -147,7 +147,7 @@
   });
 
   function usedBytes() {
-    var t = 0;
+    var t = (site.profilePhoto && site.profilePhoto.bytes) || 0;
     data.albums.forEach(function (a) { (a.photos || []).forEach(function (p) { t += p.bytes || 0; }); });
     return t;
   }
@@ -219,17 +219,15 @@
   function renderAlbum(a) {
     var ph = a.photos || [];
     var cards = ph.map(function (p, i) {
-      var isCover = coverOf(a) === p, isHero = site.heroPhoto === p.src;
+      var isCover = coverOf(a) === p;
       return '<div class="ph">' +
         '<div class="img"><img src="' + esc(previewUrl(p.thumb)) + '" alt="Foto ' + (i + 1) + '" loading="lazy">' +
-          (isCover ? '<span class="badge">Copertina</span>' : '') +
-          (isHero ? '<span class="badge' + (isCover ? ' b2' : '') + '">Foto principale</span>' : '') + '</div>' +
+          (isCover ? '<span class="badge">Copertina</span>' : '') + '</div>' +
         '<input type="text" data-cap="' + i + '" value="' + esc(p.caption || '') + '" placeholder="Didascalia (facoltativa)" aria-label="Didascalia foto ' + (i + 1) + '">' +
         '<div class="acts">' +
           '<button type="button" class="btn ghost sm" data-act="ph-left" data-i="' + i + '" aria-label="Sposta prima"' + (i === 0 ? ' disabled' : '') + '>←</button>' +
           '<button type="button" class="btn ghost sm" data-act="ph-right" data-i="' + i + '" aria-label="Sposta dopo"' + (i === ph.length - 1 ? ' disabled' : '') + '>→</button>' +
           (isCover ? '' : '<button type="button" class="btn ghost sm" data-act="ph-cover" data-i="' + i + '">Copertina</button>') +
-          (isHero ? '' : '<button type="button" class="btn ghost sm" data-act="ph-hero" data-i="' + i + '">Principale</button>') +
           delBtn('photo:' + p.src, 'ph-del', ' data-i="' + i + '"') +
         '</div></div>';
     }).join('');
@@ -267,8 +265,18 @@
         '<input type="' + (type || 'text') + '" id="t-' + id + '" data-field="' + id + '" value="' + esc(site[id] || '') + '">' +
         (hint ? '<p class="hint">' + hint + '</p>' : '') + '</div>';
     }
+    var pp = site.profilePhoto;
     $('#view').innerHTML =
       '<div class="section-head"><h1 class="h2">Testi e contatti</h1></div>' +
+      '<div class="field"><label>Foto profilo (homepage, accanto al nome)</label>' +
+        '<div class="a-row" style="border:0;padding:4px 0 0">' +
+          '<div class="thumb">' + (pp && pp.src ? '<img src="' + esc(previewUrl(pp.src)) + '" alt="Foto profilo">' : '') + '</div>' +
+          '<div class="acts">' +
+            '<label class="btn sm" style="display:inline-flex;align-items:center;margin:0;text-transform:none;letter-spacing:0;color:#FFFFFF">' +
+              (pp && pp.src ? 'Cambia foto' : 'Scegli foto') + '<input type="file" id="pp-file" accept="image/*" hidden></label>' +
+            (pp && pp.src ? delBtn('profile', 'pp-remove', '', 'Rimuovi') : '') +
+          '</div></div>' +
+        '<p class="hint" id="pp-msg">Se non c\'è nessuna foto, in homepage resta solo il nome.</p></div>' +
       '<div class="two">' +
         f('name', 'Nome') +
         f('tagline', 'Sottotitolo in homepage', 'text', 'Es. "Fotografia editoriale".') +
@@ -285,6 +293,40 @@
         f('phone', 'Telefono / WhatsApp', 'tel') +
         f('city', 'Città', 'text', 'Es. "Palermo · disponibile per trasferte"') +
       '</div>';
+    $('#pp-file').addEventListener('change', function (e) {
+      var file = e.target.files && e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+      if (busy) { $('#pp-msg').textContent = 'Aspetta che finisca il salvataggio.'; return; }
+      $('#pp-msg').textContent = 'Preparo la foto…';
+      decode(file).then(function (bmp) {
+        return resize(bmp, 1200, 0.86).then(function (r) {
+          if (bmp.close) bmp.close();
+          removeProfile();
+          var path = 'photos/profilo/' + Date.now().toString(36) + '.jpg';
+          pending.set(path, r.blob);
+          localUrls.set(path, URL.createObjectURL(r.blob));
+          site.profilePhoto = { src: path, w: r.w, h: r.h, bytes: r.blob.size };
+          markDirty();
+          render();
+          $('#pp-msg').textContent = 'Foto pronta. Ricordati di toccare "Salva e pubblica".';
+        });
+      }).catch(function () {
+        $('#pp-msg').textContent = 'Non sono riuscito a leggere la foto. Prova a salvarla in JPG.';
+      });
+    });
+  }
+
+  function removeProfile() {
+    var pp = site.profilePhoto;
+    if (!pp || !pp.src) return;
+    if (pending.has(pp.src)) {
+      pending.delete(pp.src);
+      if (localUrls.has(pp.src)) { URL.revokeObjectURL(localUrls.get(pp.src)); localUrls.delete(pp.src); }
+    } else {
+      deletions.add(pp.src);
+    }
+    site.profilePhoto = null;
   }
 
   /* ---------- Eventi ---------- */
@@ -326,6 +368,10 @@
 
     if (act === 'open') { view.album = b.dataset.slug; render(); window.scrollTo(0, 0); return; }
     if (act === 'back') { view.album = null; render(); return; }
+    if (act === 'pp-remove') {
+      if (!confirmTwice('profile')) return;
+      removeProfile(); markDirty(); render(); return;
+    }
     if (act === 'album-up' || act === 'album-down') {
       move(data.albums, i, act === 'album-up' ? -1 : 1); markDirty(); render(); return;
     }
@@ -340,7 +386,6 @@
     var p = a.photos[i];
     if (act === 'ph-left' || act === 'ph-right') { move(a.photos, i, act === 'ph-left' ? -1 : 1); markDirty(); render(); }
     else if (act === 'ph-cover') { a.cover = p.src; markDirty(); render(); }
-    else if (act === 'ph-hero') { site.heroPhoto = p.src; markDirty(); render(); }
     else if (act === 'ph-del') {
       if (!confirmTwice('photo:' + p.src)) return;
       dropPhoto(a, p); markDirty(); render();
