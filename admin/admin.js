@@ -69,14 +69,23 @@
     });
   }
 
+  // Versione (sha) dei file di contenuto letti all'apertura: serve a non sovrascrivere
+  // modifiche fatte da un'altra parte (un'altra scheda, un altro dispositivo o Claude).
+  var known = {};
   function readJson(path, fallback) {
     return api('contents/' + path + '?ref=' + BRANCH).then(function (f) {
+      known[path] = f.sha;
       return JSON.parse(b64ToText(f.content));
     }).catch(function (e) {
-      if (e.status === 404) return fallback;
+      if (e.status === 404) { known[path] = null; return fallback; }
       throw e;
     });
   }
+  function shaAt(path, ref) {
+    return api('contents/' + path + '?ref=' + ref).then(function (f) { return f.sha; })
+      .catch(function (e) { if (e.status === 404) return null; throw e; });
+  }
+  var CONTENT = ['content/site.json', 'content/albums.json'];
 
   function rawUrl(path) {
     return 'https://raw.githubusercontent.com/' + OWNER + '/' + REPO + '/' + BRANCH + '/' + path;
@@ -858,6 +867,10 @@
 
     api('git/ref/heads/' + BRANCH).then(function (ref) {
       baseSha = ref.object.sha;
+      return Promise.all(CONTENT.map(function (p) { return shaAt(p, baseSha); }));
+    }).then(function (shas) {
+      var changed = CONTENT.some(function (p, k) { return shas[k] !== known[p]; });
+      if (changed) { var e = new Error('conflict'); e.conflict = true; throw e; }
       return api('git/commits/' + baseSha);
     }).then(function (c) {
       baseTree = c.tree.sha;
@@ -886,7 +899,11 @@
     }).then(function (tree) {
       return api('git/commits', { method: 'POST', body: { message: "Aggiornamento dall'area riservata", tree: tree.sha, parents: [baseSha] } });
     }).then(function (commit) {
-      return api('git/refs/heads/' + BRANCH, { method: 'PATCH', body: { sha: commit.sha } });
+      return api('git/refs/heads/' + BRANCH, { method: 'PATCH', body: { sha: commit.sha } }).then(function () {
+        return Promise.all(CONTENT.map(function (p) { return shaAt(p, commit.sha); })).then(function (shas) {
+          CONTENT.forEach(function (p, k) { known[p] = shas[k]; });
+        });
+      });
     }).then(function () {
       snapshotPending.forEach(function (_, path) { pending.delete(path); });
       snapshotDeletions.forEach(function (path) { deletions.delete(path); });
@@ -898,6 +915,11 @@
     }).catch(function (err) {
       busy = false;
       btn.disabled = false;
+      if (err.conflict) {
+        status.textContent = 'Il sito è stato aggiornato da un\'altra parte (un\'altra scheda, un altro dispositivo o Claude). ' +
+          'Per non cancellare quelle modifiche non ho salvato: ricarica la pagina (Cmd + Shift + R) e rifai le ultime modifiche.';
+        return;
+      }
       status.textContent = err.status === 401
         ? 'La chiave di accesso è scaduta: esci e accedi di nuovo.'
         : 'Salvataggio non riuscito (' + err.message + '). Riprova.';
