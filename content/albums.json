@@ -126,13 +126,13 @@
           "cover": "photos/portrait/jane-austen/mwnz9g21f1x3r.jpg",
           "photos": [
             {
-              "src": "photos/portrait/jane-austen/mwnz9d44ufz01.jpg",
-              "thumb": "photos/portrait/jane-austen/mwnz9d44ufz01_t.jpg",
-              "w": 2400,
-              "h": 1600,
-              "tw": 900,
-              "th": 600,
-              "bytes": 706474,
+              "src": "photos/portrait/jane-austen/mwnz9efv66u1s.jpg",
+              "thumb": "photos/portrait/jane-austen/mwnz9efv66u1s_t.jpg",
+              "w": 1600,
+              "h": 2400,
+              "tw": 600,
+              "th": 900,
+              "bytes": 352852,
               "caption": "",
               "featured": true
             },
@@ -147,14 +147,15 @@
               "caption": ""
             },
             {
-              "src": "photos/portrait/jane-austen/mwnz9efv66u1s.jpg",
-              "thumb": "photos/portrait/jane-austen/mwnz9efv66u1s_t.jpg",
-              "w": 1600,
-              "h": 2400,
-              "tw": 600,
-              "th": 900,
-              "bytes": 352852,
-              "caption": ""
+              "src": "photos/portrait/jane-austen/mwnz9d44ufz01.jpg",
+              "thumb": "photos/portrait/jane-austen/mwnz9d44ufz01_t.jpg",
+              "w": 2400,
+              "h": 1600,
+              "tw": 900,
+              "th": 600,
+              "bytes": 706474,
+              "caption": "",
+              "featured": true
             },
             {
               "src": "photos/portrait/jane-austen/mwnz9eq3oiawq.jpg",
@@ -317,16 +318,6 @@
               "tw": 900,
               "th": 600,
               "bytes": 456135,
-              "caption": ""
-            },
-            {
-              "src": "photos/portrait/jane-austen/mwnz9xqxsq7yp.jpg",
-              "thumb": "photos/portrait/jane-austen/mwnz9xqxsq7yp_t.jpg",
-              "w": 1600,
-              "h": 2400,
-              "tw": 600,
-              "th": 900,
-              "bytes": 487958,
               "caption": ""
             },
             {
