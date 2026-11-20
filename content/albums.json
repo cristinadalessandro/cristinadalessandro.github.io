@@ -566,17 +566,6 @@
           "cover": "photos/portrait/out-of-time/mwp9oho8afrfn.jpg",
           "photos": [
             {
-              "src": "photos/portrait/out-of-time/mwp9o3ouaz82h.jpg",
-              "thumb": "photos/portrait/out-of-time/mwp9o3ouaz82h_t.jpg",
-              "w": 1600,
-              "h": 2400,
-              "tw": 600,
-              "th": 900,
-              "bytes": 544437,
-              "caption": "",
-              "featured": true
-            },
-            {
               "src": "photos/portrait/out-of-time/mwp9o3x67h3r3.jpg",
               "thumb": "photos/portrait/out-of-time/mwp9o3x67h3r3_t.jpg",
               "w": 1600,
@@ -604,6 +593,17 @@
               "tw": 600,
               "th": 900,
               "bytes": 590213,
+              "caption": "",
+              "featured": true
+            },
+            {
+              "src": "photos/portrait/out-of-time/mwp9o3ouaz82h.jpg",
+              "thumb": "photos/portrait/out-of-time/mwp9o3ouaz82h_t.jpg",
+              "w": 1600,
+              "h": 2400,
+              "tw": 600,
+              "th": 900,
+              "bytes": 544437,
               "caption": "",
               "featured": true
             },
