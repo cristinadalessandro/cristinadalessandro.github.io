@@ -83,10 +83,9 @@
 
   function chrome(site, albums, current) {
     $('#brand').textContent = site.name;
-    var html = '<a href="work.html"' + (current === 'work' ? ' aria-current="page"' : '') + '>Work</a>';
-    html += albums.map(function (a) {
-      return '<a href="' + albumUrl(a) + '"' + (current === a.slug ? ' aria-current="page"' : '') + '>' + esc(a.title) + '</a>';
-    }).join('');
+    // Work contiene tutte le cartelle (Portrait, Travel, ...): resta evidenziato anche dentro una cartella
+    var inWork = current === 'work' || albums.some(function (a) { return a.slug === current; });
+    var html = '<a href="work.html"' + (inWork ? ' aria-current="page"' : '') + '>Work</a>';
     html += '<a href="about.html"' + (current === 'about' ? ' aria-current="page"' : '') + '>About</a>';
     html += '<a href="about.html#contact">Contact</a>';
     $('#nav').innerHTML = html;
