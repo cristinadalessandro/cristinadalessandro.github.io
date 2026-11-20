@@ -16,5 +16,12 @@
     "y": 100
   },
   "statement": "Exploring the connection between people and places through photography, cinematic perspectives and visual storytelling.",
-  "featurePhoto": "photos/travel/photos/mwpa4s4qjglxc.jpg"
+  "featurePhoto": "photos/travel/photos/mwpa4s4qjglxc.jpg",
+  "featureVideo": {
+    "src": "photos/video/mwpf80qn.mov",
+    "w": 720,
+    "h": 1280,
+    "bytes": 9287422,
+    "poster": "photos/video/mwpf80qn_poster.jpg"
+  }
 }
