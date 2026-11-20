@@ -115,7 +115,8 @@
               "bytes": 190746,
               "caption": ""
             }
-          ]
+          ],
+          "place": "London, UK"
         },
         {
           "slug": "jane-austen",
@@ -369,7 +370,8 @@
               "caption": "",
               "featured": true
             }
-          ]
+          ],
+          "place": "London, UK"
         },
         {
           "slug": "sculptural-movement",
@@ -562,7 +564,8 @@
               "bytes": 310750,
               "caption": ""
             }
-          ]
+          ],
+          "place": "London, UK"
         },
         {
           "slug": "out-of-time",
@@ -715,7 +718,8 @@
               "bytes": 616041,
               "caption": ""
             }
-          ]
+          ],
+          "place": "London, UK"
         }
       ],
       "coverProject": "amber",
