@@ -409,15 +409,21 @@
     var pp = site.profilePhoto;
     $('#view').innerHTML =
       '<div class="section-head"><h1 class="h2">Testi e contatti</h1></div>' +
-      '<div class="field"><label>Foto profilo (homepage, accanto al nome)</label>' +
+      '<div class="field"><label>Foto profilo (pagina About, in un cerchio)</label>' +
         '<div class="a-row" style="border:0;padding:4px 0 0">' +
-          '<div class="thumb">' + (pp && pp.src ? '<img src="' + esc(previewUrl(pp.src)) + '" alt="Foto profilo">' : '') + '</div>' +
+          '<div class="thumb" style="width:120px;height:120px;border-radius:50%">' + (pp && pp.src ? '<img id="pp-img" src="' + esc(previewUrl(pp.src)) + '" alt="Foto profilo" style="object-position:' + ppPos(pp) + '">' : '') + '</div>' +
           '<div class="acts">' +
             '<label class="btn sm" style="display:inline-flex;align-items:center;margin:0;text-transform:none;letter-spacing:0;color:#FFFFFF">' +
               (pp && pp.src ? 'Cambia foto' : 'Scegli foto') + '<input type="file" id="pp-file" accept="image/*" hidden></label>' +
             (pp && pp.src ? delBtn('profile', 'pp-remove', '', 'Rimuovi') : '') +
           '</div></div>' +
-        '<p class="hint" id="pp-msg">Se non c\'è nessuna foto, in homepage resta solo il nome.</p></div>' +
+        (pp && pp.src
+          ? '<div class="two" style="max-width:520px;margin-top:12px">' +
+              '<div><label for="pp-x">Sposta a destra / sinistra</label><input type="range" id="pp-x" min="0" max="100" value="' + (pp.x != null ? pp.x : 50) + '" style="width:100%"></div>' +
+              '<div><label for="pp-y">Sposta in alto / in basso</label><input type="range" id="pp-y" min="0" max="100" value="' + (pp.y != null ? pp.y : 50) + '" style="width:100%"></div>' +
+            '</div>'
+          : '') +
+        '<p class="hint" id="pp-msg">Meglio una foto quadrata o col viso al centro: viene ritagliata in un cerchio.</p></div>' +
       '<div class="two">' +
         f('name', 'Nome') +
         f('tagline', 'Sottotitolo in homepage', 'text', 'In inglese, es. "Editorial photography".') +
@@ -458,6 +464,8 @@
       });
     });
   }
+
+  function ppPos(pp) { return (pp.x != null ? pp.x : 50) + '% ' + (pp.y != null ? pp.y : 50) + '%'; }
 
   function removeProfile() {
     var pp = site.profilePhoto;
@@ -500,6 +508,12 @@
   $('#view').addEventListener('input', function (e) {
     var el = e.target;
     if (el.dataset.field) { site[el.dataset.field] = el.value; markDirty(); return; }
+    if ((el.id === 'pp-x' || el.id === 'pp-y') && site.profilePhoto) {
+      site.profilePhoto[el.id === 'pp-x' ? 'x' : 'y'] = +el.value;
+      var im = $('#pp-img');
+      if (im) im.style.objectPosition = ppPos(site.profilePhoto);
+      markDirty(); return;
+    }
     var a = view.album && findAlbum(view.album);
     if (!a) return;
     var pr = currentProject(a);

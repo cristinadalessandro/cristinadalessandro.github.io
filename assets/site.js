@@ -180,9 +180,6 @@
     intro.textContent = site.intro || '';
     intro.hidden = !site.intro;
 
-    var pp = site.profilePhoto, hero = $('#hero');
-    if (pp && pp.src) hero.innerHTML = '<img src="' + esc(pp.src) + '" alt="' + esc(site.name) + '" width="' + (pp.w || 960) + '" height="' + (pp.h || 1200) + '">';
-    else hero.hidden = true;
 
     /* Griglia con le foto scelte per la homepage */
     function featured(a) { return albumItems(a).filter(function (it) { return it.p.featured; }); }
@@ -326,6 +323,12 @@
     var site = d.site;
     chrome(site, d.albums, 'about');
     document.title = 'About — ' + site.name;
+    var pp = site.profilePhoto, av = $('#avatar');
+    if (pp && pp.src) {
+      var pos = (pp.x != null ? +pp.x : 50) + '% ' + (pp.y != null ? +pp.y : 50) + '%';
+      av.innerHTML = '<img src="' + esc(pp.src) + '" alt="' + esc(site.name) + '" style="object-position:' + pos + '">';
+      av.hidden = false;
+    }
     $('#bio').innerHTML = (site.bio || '').split(/\n\s*\n/).filter(Boolean).map(function (p) {
       return '<p>' + esc(p.trim()).replace(/\n/g, '<br>') + '</p>';
     }).join('');
