@@ -352,8 +352,8 @@
   function renderProject(a, pr, gallery) {
     var cards = pr.photos.map(function (p, i) {
       var isCover = projectCover(pr) === p;
-      return '<div class="ph">' +
-        '<div class="img"><img src="' + esc(previewUrl(p.thumb)) + '" alt="Foto ' + (i + 1) + '" loading="lazy">' +
+      return '<div class="ph" data-i="' + i + '">' +
+        '<div class="img" title="Tieni premuto e trascina per spostare"><img src="' + esc(previewUrl(p.thumb)) + '" alt="Foto ' + (i + 1) + '" loading="lazy" draggable="false">' +
           (isCover ? '<span class="badge">Copertina</span>' : '') +
           (p.featured ? '<span class="badge' + (isCover ? ' b2' : '') + '">★ In homepage</span>' : '') +
           (site.featurePhoto === p.src ? '<span class="badge" style="top:auto;bottom:6px">Foto grande in homepage</span>' : '') + '</div>' +
@@ -363,8 +363,6 @@
           (site.featurePhoto === p.src ? 'Togli come foto grande' : 'Usa come foto grande') + '</button>' +
         '<input type="text" data-cap="' + i + '" value="' + esc(p.caption || '') + '" placeholder="Didascalia (facoltativa)" aria-label="Didascalia foto ' + (i + 1) + '">' +
         '<div class="acts">' +
-          '<button type="button" class="btn ghost sm" data-act="ph-left" data-i="' + i + '" aria-label="Sposta prima"' + (i === 0 ? ' disabled' : '') + '>←</button>' +
-          '<button type="button" class="btn ghost sm" data-act="ph-right" data-i="' + i + '" aria-label="Sposta dopo"' + (i === pr.photos.length - 1 ? ' disabled' : '') + '>→</button>' +
           (isCover ? '' : '<button type="button" class="btn ghost sm" data-act="ph-cover" data-i="' + i + '">Copertina</button>') +
           delBtn('photo:' + p.src, 'ph-del', ' data-i="' + i + '"') +
         '</div></div>';
@@ -394,8 +392,16 @@
           '<input type="file" id="files" accept="image/*" multiple hidden></label>' +
         '<p class="hint" id="upmsg" style="margin-top:12px">Le foto vengono ridotte e ottimizzate in automatico.</p>' +
       '</div>' +
-      '<div class="section-head" style="margin-bottom:24px"><h2 class="h2" style="font-size:32px">Foto</h2><span class="meta">' + pr.photos.length + ' foto</span></div>' +
-      (cards ? '<div class="photos">' + cards + '</div>' : '<p class="hint">Ancora nessuna foto qui.</p>');
+      '<div class="section-head" style="margin-bottom:8px"><h2 class="h2" style="font-size:32px">Foto</h2><span class="meta">' + pr.photos.length + ' foto</span></div>' +
+      (cards ? '<p class="hint" style="margin:0 0 20px">Per cambiare l\'ordine, <strong>tieni premuta una foto e trascinala</strong> dove vuoi (su telefono: tieni premuto un attimo, poi trascina).</p>' +
+        '<div class="photos" id="photos">' + cards + '</div>' : '<p class="hint">Ancora nessuna foto qui.</p>');
+    if (cards) sortable($('#photos'), function (order) {
+      var old = pr.photos, moved = order.some(function (k, j) { return k !== j; });
+      if (!moved) return;
+      pr.photos = order.map(function (k) { return old[k]; });
+      markDirty();
+      render();
+    });
 
     var drop = $('#drop');
     ['dragenter', 'dragover'].forEach(function (ev) {
@@ -585,8 +591,6 @@
     if (!pr) return;
     var p = pr.photos[i];
     switch (act) {
-      case 'ph-left': case 'ph-right':
-        move(pr.photos, i, act === 'ph-left' ? -1 : 1); markDirty(); render(); return;
       case 'ph-cover': pr.cover = p.src; markDirty(); render(); return;
       case 'ph-big': site.featurePhoto = site.featurePhoto === p.src ? '' : p.src; markDirty(); render(); return;
       case 'ph-feature': p.featured = !p.featured; if (!p.featured) delete p.featured; markDirty(); render(); return;
@@ -595,6 +599,101 @@
         dropPhoto(pr, p); markDirty(); render(); return;
     }
   });
+
+  /* ---------- Trascinare le foto per cambiare l'ordine ----------
+     Mouse: premi e trascina. Telefono/tablet: tieni premuto un attimo, poi trascina. */
+  function sortable(container, onDrop) {
+    var src = null, ghost = null, active = false, timer = null;
+    var startX = 0, startY = 0, offX = 0, offY = 0, lastY = 0, raf = 0;
+
+    function begin(x, y) {
+      if (!src) return;
+      active = true;
+      var box = src.querySelector('.img'), r = box.getBoundingClientRect();
+      ghost = box.cloneNode(true);
+      ghost.className = 'drag-ghost';
+      ghost.style.width = r.width + 'px';
+      ghost.style.height = r.height + 'px';
+      offX = x - r.left; offY = y - r.top;
+      document.body.appendChild(ghost);
+      src.classList.add('drag-src');
+      document.body.classList.add('dragging');
+      move(x, y);
+      loop();
+    }
+    function move(x, y) {
+      lastY = y;
+      ghost.style.transform = 'translate(' + (x - offX) + 'px,' + (y - offY) + 'px)';
+      var el = document.elementFromPoint(x, y), over = el && el.closest('.ph');
+      if (over && over !== src && over.parentNode === container) {
+        var kids = Array.prototype.slice.call(container.children);
+        var a = kids.indexOf(src), b = kids.indexOf(over);
+        container.insertBefore(src, a < b ? over.nextSibling : over);
+      }
+    }
+    function loop() {
+      if (!active) return;
+      if (lastY < 90) window.scrollBy(0, -14);
+      else if (lastY > window.innerHeight - 90) window.scrollBy(0, 14);
+      raf = requestAnimationFrame(loop);
+    }
+    function end() {
+      clearTimeout(timer); timer = null;
+      if (active) {
+        active = false;
+        cancelAnimationFrame(raf);
+        ghost.remove(); ghost = null;
+        src.classList.remove('drag-src');
+        document.body.classList.remove('dragging');
+        var order = Array.prototype.map.call(container.children, function (c) { return +c.dataset.i; });
+        src = null;
+        onDrop(order);
+        return;
+      }
+      src = null;
+    }
+
+    // Mouse e penna
+    container.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'touch' || e.button !== 0) return;
+      var h = e.target.closest('.img');
+      if (!h) return;
+      e.preventDefault();
+      src = h.closest('.ph'); startX = e.clientX; startY = e.clientY;
+      function mv(ev) {
+        if (!active && Math.abs(ev.clientX - startX) + Math.abs(ev.clientY - startY) > 6) begin(ev.clientX, ev.clientY);
+        if (active) move(ev.clientX, ev.clientY);
+      }
+      function up() {
+        document.removeEventListener('pointermove', mv);
+        document.removeEventListener('pointerup', up);
+        end();
+      }
+      document.addEventListener('pointermove', mv);
+      document.addEventListener('pointerup', up);
+    });
+
+    // Tocco: pressione lunga, poi trascina
+    container.addEventListener('touchstart', function (e) {
+      var h = e.target.closest('.img');
+      if (!h || e.touches.length > 1) return;
+      src = h.closest('.ph');
+      startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+      timer = setTimeout(function () {
+        timer = null;
+        begin(startX, startY);
+        if (navigator.vibrate) navigator.vibrate(15);
+      }, 280);
+    }, { passive: true });
+    container.addEventListener('touchmove', function (e) {
+      var t = e.touches[0];
+      if (active) { e.preventDefault(); move(t.clientX, t.clientY); }
+      else if (timer && Math.abs(t.clientX - startX) + Math.abs(t.clientY - startY) > 10) { clearTimeout(timer); timer = null; src = null; }
+    }, { passive: false });
+    container.addEventListener('touchend', end);
+    container.addEventListener('touchcancel', end);
+    container.addEventListener('contextmenu', function (e) { if (e.target.closest('.img')) e.preventDefault(); });
+  }
 
   /* ---------- Foto: riduzione e ottimizzazione ---------- */
   function decode(file) {
