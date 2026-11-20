@@ -315,7 +315,7 @@
       var n = pr.photos.length, isCover = albumCover(a) && albumCover(a) === projectCover(pr);
       return '<div class="a-row">' + thumbBox(projectCover(pr)) +
         '<div class="info"><div class="name">' + esc(pr.title) + '</div><div class="hint">' +
-          (pr.year ? esc(pr.year) + ' · ' : '') + n + ' foto' + (n ? '' : ' · non visibile sul sito finché è vuoto') +
+          [pr.year, pr.place].filter(Boolean).map(esc).concat([n + ' foto']).join(' · ') + (n ? '' : ' · non visibile sul sito finché è vuoto') +
           (isCover ? ' · <strong>copertina della cartella</strong>' : '') + '</div></div>' +
         '<div class="acts">' +
           '<button type="button" class="btn sm" data-act="open-project" data-slug="' + esc(pr.slug) + '">Apri</button>' +
@@ -335,9 +335,10 @@
       modeToggle(a) +
       '<div class="section-head" style="margin:32px 0 0"><h2 class="h2" style="font-size:32px">Progetti</h2><span class="meta">L\'ordine qui è l\'ordine sul sito</span></div>' +
       '<div class="card-list">' + (rows || '<p class="hint" style="padding:16px 0">Nessun progetto. Creane uno qui sotto.</p>') + '</div>' +
-      '<form class="new-album" id="new-project" style="max-width:640px">' +
+      '<form class="new-album" id="new-project" style="max-width:820px">' +
         '<input type="text" id="np-title" placeholder="Titolo del progetto (in inglese)" aria-label="Titolo del nuovo progetto" required>' +
         '<input type="text" id="np-year" placeholder="Anno" aria-label="Anno" style="flex:0 1 110px">' +
+        '<input type="text" id="np-place" placeholder="Luogo" aria-label="Luogo" style="flex:0 1 180px">' +
         '<button class="btn" type="submit">Crea progetto</button></form>';
   }
 
@@ -382,6 +383,7 @@
           '<div class="field"><label for="p-title">Titolo del progetto</label><input type="text" id="p-title" value="' + esc(pr.title) + '"></div>' +
           '<div class="field"><label for="p-year">Anno</label><input type="text" id="p-year" value="' + esc(pr.year || '') + '"></div>' +
         '</div>' +
+        '<div class="field"><label for="p-place">Luogo (in inglese, es. "London, UK")</label><input type="text" id="p-place" value="' + esc(pr.place || '') + '"></div>' +
         '<div class="field"><label for="p-desc">Descrizione (facoltativa, in inglese)</label>' +
           '<textarea id="p-desc" style="min-height:80px">' + esc(pr.description || '') + '</textarea></div>' +
         linkHint('album.html?a=' + encodeURIComponent(a.slug) + '&p=' + encodeURIComponent(pr.slug), 'Link di questo progetto');
@@ -506,7 +508,7 @@
       var t = $('#np-title').value.trim();
       if (!a || !t) return;
       var ps = uniqueSlug(slugify(t), function (s) { return findProject(a, s); });
-      a.projects.push({ slug: ps, title: t, year: $('#np-year').value.trim(), description: '', cover: '', photos: [] });
+      a.projects.push({ slug: ps, title: t, year: $('#np-year').value.trim(), place: $('#np-place').value.trim(), description: '', cover: '', photos: [] });
       markDirty();
       view.project = ps;
       render();
@@ -539,6 +541,7 @@
     else if (!pr) return;
     else if (el.id === 'p-title') { pr.title = el.value; markDirty(); }
     else if (el.id === 'p-year') { pr.year = el.value; markDirty(); }
+    else if (el.id === 'p-place') { pr.place = el.value; markDirty(); }
     else if (el.id === 'p-desc') { pr.description = el.value; markDirty(); }
     else if (el.dataset.cap != null) { pr.photos[+el.dataset.cap].caption = el.value; markDirty(); }
   });

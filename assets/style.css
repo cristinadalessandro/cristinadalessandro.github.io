@@ -112,7 +112,7 @@ img { display: block; max-width: 100%; }
 .album-card:hover .frame img { opacity: 0.9; }
 .album-card .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .album-card .t { font-family: var(--serif); font-size: 32px; line-height: 1.1; }
-.album-card .go { font-size: 13px; color: var(--muted); }
+.album-card .go { font-size: 13px; color: var(--muted); white-space: nowrap; }
 .album-grid.projects { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
 .card-year { margin-top: -8px; }
 .project-grid { padding-bottom: 96px; }

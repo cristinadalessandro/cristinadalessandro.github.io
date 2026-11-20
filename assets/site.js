@@ -231,7 +231,7 @@
       var c = albumCover(a), label;
       if (a.mode === 'photos') {
         var nf = photoCount(a);
-        label = nf ? nf + (nf === 1 ? ' photo →' : ' photos →') : 'Coming soon';
+        label = nf ? 'View →' : 'Coming soon';
       } else {
         var n = a.projects.filter(function (p) { return p.photos.length; }).length;
         label = n ? n + (n === 1 ? ' project →' : ' projects →') : 'Coming soon';
@@ -264,7 +264,7 @@
       gdesc.hidden = !a.description;
       var gitems = [];
       a.projects.forEach(function (pr) { pr.photos.forEach(function (p) { gitems.push({ p: p, album: a, project: pr }); }); });
-      $('#acount').textContent = gitems.length === 1 ? '1 photo' : gitems.length + ' photos';
+      $('#acount').hidden = true;
       $('#share').textContent = 'Share this collection';
       $('#share').addEventListener('click', function () { share(a.title + ' — ' + site.name, 'Link copied'); });
       if (!gitems.length) { grid.outerHTML = '<p class="empty">Photos coming soon.</p>'; return; }
@@ -301,11 +301,11 @@
       if (!visible.length) { grid.outerHTML = '<p class="empty">Projects coming soon.</p>'; return; }
       grid.className = 'album-grid projects';
       grid.innerHTML = visible.map(function (p) {
-        var c = projectCover(p), n = p.photos.length;
+        var c = projectCover(p), info = [p.year, p.place].filter(Boolean).join(' · ');
         return '<a class="album-card" href="' + projectUrl(a, p) + '">' +
           '<div class="frame">' + img(c, p.title) + '</div>' +
-          '<div class="row"><span class="t">' + esc(p.title) + '</span><span class="go">' + n + (n === 1 ? ' photo →' : ' photos →') + '</span></div>' +
-          (p.year ? '<span class="meta card-year">' + esc(p.year) + '</span>' : '') + '</a>';
+          '<div class="row"><span class="t">' + esc(p.title) + '</span><span class="go">View →</span></div>' +
+          (info ? '<span class="meta card-year">' + esc(info) + '</span>' : '') + '</a>';
       }).join('');
       return;
     }
@@ -318,8 +318,9 @@
     var pdesc = $('#adesc');
     pdesc.textContent = pr.description || '';
     pdesc.hidden = !pr.description;
-    var n = pr.photos.length;
-    $('#acount').textContent = (pr.year ? pr.year + ' · ' : '') + (n === 1 ? '1 photo' : n + ' photos');
+    var n = pr.photos.length, info = [pr.year, pr.place].filter(Boolean).join(' · ');
+    $('#acount').textContent = info;
+    $('#acount').hidden = !info;
     $('#share').textContent = 'Share this project';
     $('#share').addEventListener('click', function () { share(pr.title + ' — ' + site.name, 'Link copied'); });
     if (!n) { grid.outerHTML = '<p class="empty">Photos coming soon.</p>'; return; }
