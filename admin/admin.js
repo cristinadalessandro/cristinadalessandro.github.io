@@ -168,7 +168,7 @@
   });
 
   function usedBytes() {
-    var t = (site.profilePhoto && site.profilePhoto.bytes) || 0;
+    var t = ((site.profilePhoto && site.profilePhoto.bytes) || 0) + ((site.featureVideo && site.featureVideo.bytes) || 0);
     data.albums.forEach(function (a) {
       a.projects.forEach(function (pr) { pr.photos.forEach(function (p) { t += p.bytes || 0; }); });
     });
@@ -447,6 +447,7 @@
         '<textarea id="t-statement" data-field="statement" style="min-height:80px">' + esc(site.statement || '') + '</textarea>' +
         '<p class="hint">Compare in corsivo tra la striscia di foto e la foto grande. Se la lasci vuota non compare. ' +
         'La foto grande la scegli da un progetto, col pulsante "Usa come foto grande".</p></div>' +
+      videoField() +
       '<div class="field"><label for="t-bio">Biografia</label>' +
         '<textarea id="t-bio" data-field="bio" style="min-height:260px">' + esc(site.bio || '') + '</textarea>' +
         '<p class="hint">Il sito è in inglese: scrivi la bio in inglese. Lascia una riga vuota per iniziare un nuovo paragrafo.</p></div>' +
@@ -458,6 +459,11 @@
         f('city', 'Città', 'text', 'In inglese, es. "Palermo, Italy · available for travel"') +
       '</div>';
 
+    $('#fv-file').addEventListener('change', function (e) {
+      var file = e.target.files && e.target.files[0];
+      e.target.value = '';
+      if (file) addVideo(file);
+    });
     $('#pp-file').addEventListener('change', function (e) {
       var file = e.target.files && e.target.files[0];
       e.target.value = '';
@@ -480,6 +486,78 @@
         $('#pp-msg').textContent = 'Non sono riuscito a leggere la foto. Prova a salvarla in JPG.';
       });
     });
+  }
+
+  /* Video in homepage, al posto della foto grande */
+  var VIDEO_MAX = 40 * 1024 * 1024;
+  function videoField() {
+    var fv = site.featureVideo;
+    return '<div class="field"><label>Video in homepage (al posto della foto grande)</label>' +
+      (fv && fv.src
+        ? '<video id="fv-prev" src="' + esc(previewUrl(fv.src)) + '"' + (fv.poster ? ' poster="' + esc(previewUrl(fv.poster)) + '"' : '') +
+          ' muted loop autoplay playsinline style="display:block;width:100%;max-width:440px;margin:6px 0 12px;background:var(--ph)"></video>'
+        : '') +
+      '<div style="display:flex;flex-wrap:wrap;gap:8px">' +
+        '<label class="btn sm" style="display:inline-flex;align-items:center;margin:0;text-transform:none;letter-spacing:0;color:#FFFFFF">' +
+          (fv && fv.src ? 'Cambia video' : 'Scegli video') + '<input type="file" id="fv-file" accept="video/mp4,video/webm,video/quicktime,.mp4,.mov,.webm" hidden></label>' +
+        (fv && fv.src ? delBtn('fvideo', 'fv-remove', '', 'Rimuovi video') : '') +
+      '</div>' +
+      '<p class="hint" id="fv-msg">Clip breve, parte da sola in loop e senza audio. Formato <strong>MP4</strong>, massimo 40 MB ' +
+        '(ideale 10-30 secondi, orizzontale, 1080p). Se c\'è un video, prende il posto della foto grande.</p></div>';
+  }
+
+  function removeVideo() {
+    var fv = site.featureVideo;
+    if (!fv || !fv.src) return;
+    forget(fv.src);
+    if (fv.poster) forget(fv.poster);
+    site.featureVideo = null;
+  }
+
+  function addVideo(file) {
+    var msg = $('#fv-msg');
+    if (busy) { msg.textContent = 'Aspetta che finisca il salvataggio.'; return; }
+    if (file.size > VIDEO_MAX) {
+      msg.textContent = 'Il video pesa ' + Math.round(file.size / 1048576) + ' MB: il massimo è 40 MB. Accorcialo o esportalo in qualità più bassa (1080p).';
+      return;
+    }
+    msg.textContent = 'Controllo il video…';
+    var url = URL.createObjectURL(file), v = document.createElement('video');
+    v.muted = true; v.playsInline = true; v.preload = 'auto'; v.src = url;
+    var done = false;
+    function fail() {
+      if (done) return; done = true;
+      URL.revokeObjectURL(url);
+      msg.textContent = 'Questo video non si riesce a leggere nel browser. Esportalo in MP4 (H.264) e riprova.';
+    }
+    v.onerror = fail;
+    setTimeout(fail, 20000);
+    v.onloadeddata = function () { v.currentTime = Math.min(0.1, (v.duration || 1) / 2); };
+    v.onseeked = function () {
+      if (done) return; done = true;
+      var w = v.videoWidth, h = v.videoHeight;
+      if (!w || !h) { done = false; return fail(); }
+      var s = Math.min(1, 1600 / Math.max(w, h)), c = document.createElement('canvas');
+      c.width = Math.round(w * s); c.height = Math.round(h * s);
+      c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+      c.toBlob(function (poster) {
+        removeVideo();
+        var id = Date.now().toString(36);
+        var ext = (/\.(webm|mov)$/i.exec(file.name) || [0, 'mp4'])[1].toLowerCase();
+        var path = 'photos/video/' + id + '.' + ext, ppath = 'photos/video/' + id + '_poster.jpg';
+        pending.set(path, file);
+        localUrls.set(path, url);
+        site.featureVideo = { src: path, w: w, h: h, bytes: file.size + (poster ? poster.size : 0) };
+        if (poster) {
+          pending.set(ppath, poster);
+          localUrls.set(ppath, URL.createObjectURL(poster));
+          site.featureVideo.poster = ppath;
+        }
+        markDirty();
+        render();
+        $('#fv-msg').textContent = 'Video pronto. Tocca "Salva e pubblica": il caricamento può richiedere qualche minuto.';
+      }, 'image/jpeg', 0.82);
+    };
   }
 
   function ppPos(pp) { return (pp.x != null ? pp.x : 50) + '% ' + (pp.y != null ? pp.y : 50) + '%'; }
@@ -573,6 +651,9 @@
         data.albums = data.albums.filter(function (x) { return x !== target; });
         markDirty(); render(); return;
       }
+      case 'fv-remove':
+        if (!confirmTwice('fvideo')) return;
+        removeVideo(); markDirty(); render(); return;
       case 'pp-remove':
         if (!confirmTwice('profile')) return;
         removeProfile(); markDirty(); render(); return;

@@ -75,6 +75,7 @@ img { display: block; max-width: 100%; }
 /* Foto grande */
 .feature { margin: 0 0 104px; }
 .feature img { width: 100%; height: auto; max-height: 88vh; object-fit: cover; }
+.feature-video { display: block; width: 100%; height: auto; max-height: 88vh; object-fit: cover; background: var(--ph); }
 .feature figcaption { margin-top: 12px; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
 @media (max-width: 560px) { .feature { margin-bottom: 72px; } }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }

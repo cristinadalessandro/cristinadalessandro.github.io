@@ -210,10 +210,21 @@
       $('#statement').hidden = false;
     }
 
-    /* Foto grande */
-    var feat = null;
+    /* Video (se c'è) oppure foto grande */
+    var fv = site.featureVideo, feat = null;
     albums.forEach(function (a) { albumItems(a).forEach(function (it) { if (it.p.src === site.featurePhoto) feat = it; }); });
-    if (feat) {
+    if (fv && fv.src) {
+      var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      $('#feature').innerHTML = '<video class="feature-video" src="' + esc(fv.src) + '"' +
+        (fv.poster ? ' poster="' + esc(fv.poster) + '"' : '') +
+        (calm ? ' controls' : ' autoplay') + ' muted loop playsinline preload="metadata"' +
+        (fv.w && fv.h ? ' width="' + fv.w + '" height="' + fv.h + '"' : '') + '></video>' +
+        (fv.caption ? '<figcaption>' + esc(fv.caption) + '</figcaption>' : '');
+      $('#feature').hidden = false;
+      var vid = $('#feature video');
+      vid.muted = true;
+      if (!calm && vid.play) { var pr = vid.play(); if (pr && pr.catch) pr.catch(function () { vid.controls = true; }); }
+    } else if (feat) {
       var fp = feat.p;
       $('#feature').innerHTML = '<a href="' + (feat.album.mode === 'photos' ? albumUrl(feat.album) : projectUrl(feat.album, feat.project)) + '">' +
         '<img src="' + esc(fp.src) + '" alt="' + esc(fp.caption || feat.project.title) + '" width="' + fp.w + '" height="' + fp.h + '" loading="lazy" decoding="async"></a>' +
