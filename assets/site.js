@@ -222,6 +222,15 @@
     }
 
     albumCards(albums);
+
+    /* Invito a contattare, in fondo alla pagina */
+    var direct = [];
+    if (site.email) direct.push('<a href="mailto:' + esc(site.email) + '">' + esc(site.email) + '</a>');
+    if (site.instagram) {
+      var ig = site.instagram.replace(/^@/, '').trim();
+      direct.push('<a href="https://instagram.com/' + encodeURIComponent(ig) + '" target="_blank" rel="noopener">Instagram @' + esc(ig) + '</a>');
+    }
+    $('#cta-direct').innerHTML = direct.join('<span aria-hidden="true"> · </span>');
   }
 
   /* Copertine delle cartelle (homepage e pagina Work) */

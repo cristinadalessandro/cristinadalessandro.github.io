@@ -120,6 +120,14 @@ img { display: block; max-width: 100%; }
 @media (max-width: 900px) { .mosaic.wide { --rh: 240px; } }
 @media (max-width: 560px) { .mosaic.wide { display: flex; flex-direction: column; columns: auto; gap: 8px; } .mosaic.wide .tile { width: 100%; margin: 0; flex-grow: 0; } }
 
+/* Invito a contattare in fondo alla homepage */
+.cta-end { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; padding: 104px 0 120px; border-top: 1px solid var(--line); }
+.cta-title { margin: 0; font-family: var(--serif); font-weight: 400; font-size: clamp(44px, 6.5vw, 84px); line-height: 1; }
+.cta-sub { margin: 0; max-width: 460px; color: var(--soft); }
+.cta-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 16px 24px; margin-top: 12px; font-size: 14px; }
+#cta-direct a { border-bottom: 1px solid var(--line); }
+@media (max-width: 560px) { .cta-end { padding: 72px 0 88px; } }
+
 /* Piè di pagina */
 .footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; padding: 32px 0 48px; border-top: 1px solid var(--line); font-size: 13px; color: var(--soft); }
 
