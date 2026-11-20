@@ -49,9 +49,16 @@ img { display: block; max-width: 100%; }
 .strip { padding-bottom: 104px; }
 .strip-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .strip-arrows { display: flex; gap: 8px; }
-.arrow { font: inherit; font-size: 18px; width: 44px; height: 44px; border: 1px solid var(--ink); background: #FFFFFF; color: var(--ink); cursor: pointer; }
-.arrow:hover { background: var(--ink); color: #FFFFFF; }
-.arrow:disabled { border-color: var(--line); color: #BDBDBD; background: #FFFFFF; cursor: default; }
+.arrow { font: inherit; font-size: 24px; line-height: 1; width: 44px; height: 44px; border: 0; background: none; color: var(--ink); cursor: pointer; transition: opacity 0.2s, transform 0.2s; }
+.arrow:hover { transform: translateX(var(--nudge, 0)); }
+#strip-prev { --nudge: -3px; }
+#strip-next { --nudge: 3px; }
+.arrow:disabled { opacity: 0.25; cursor: default; transform: none; }
+/* Variante: frecce ai lati della galleria, sopra le foto */
+.strip.side { position: relative; }
+.strip.side .strip-arrows { position: absolute; left: 0; right: 0; top: calc(50% + 18px); transform: translateY(-50%); justify-content: space-between; pointer-events: none; z-index: 2; }
+.strip.side .arrow { pointer-events: auto; color: #FFFFFF; font-size: 30px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45), 0 0 14px rgba(0, 0, 0, 0.45); margin: 0 8px; }
+.strip.side .arrow:disabled { opacity: 0; }
 .strip-track { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .strip-track::-webkit-scrollbar { display: none; }
 .strip-item { flex: none; height: 480px; padding: 0; border: 0; background: var(--ph); scroll-snap-align: start; cursor: zoom-in; overflow: hidden; }

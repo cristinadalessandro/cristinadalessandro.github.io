@@ -176,9 +176,6 @@
     document.title = site.name + ' — ' + (site.tagline || 'Photography');
     $('#tagline').textContent = site.tagline || '';
     $('#name').innerHTML = nameHtml(site.name);
-    var intro = $('#intro');
-    intro.textContent = site.intro || '';
-    intro.hidden = !site.intro;
 
 
     /* Striscia orizzontale con le foto scelte per la homepage */
@@ -207,8 +204,9 @@
     setTimeout(arrows, 300);
 
     /* Frase */
-    if (site.statement) {
-      $('#statement-text').textContent = site.statement;
+    var phrase = site.statement || site.intro;
+    if (phrase) {
+      $('#statement-text').textContent = phrase;
       $('#statement').hidden = false;
     }
 

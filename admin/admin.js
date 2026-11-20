@@ -119,6 +119,9 @@
     }).then(function (res) {
       site = res[0];
       data = res[1];
+      // la frase scritta nel vecchio campo sotto il nome diventa la frase sotto la galleria
+      if (site.intro && !site.statement) { site.statement = site.intro; }
+      delete site.intro;
       normalize();
       $('#login').hidden = true;
       $('#app').hidden = false;
