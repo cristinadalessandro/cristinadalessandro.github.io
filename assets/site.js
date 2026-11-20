@@ -134,8 +134,10 @@
       }
       var next = new Image();
       next.src = items[(cur + 1) % items.length].p.src;
+      resetZoom();
     }
     function close() {
+      resetZoom();
       lb.classList.remove('open');
       document.body.style.overflow = '';
       lbImg.removeAttribute('src');
@@ -150,15 +152,79 @@
       else if (e.key === 'ArrowRight') show(cur + 1);
       else if (e.key === 'ArrowLeft') show(cur - 1);
     });
-    var x0 = null, y0 = null, stage = $('#lb-stage');
-    stage.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+    /* Zoom sulla foto aperta: due dita, trackpad, doppio tocco / doppio clic; poi si sposta trascinando */
+    var stage = $('#lb-stage'), scale = 1, tx = 0, ty = 0, MAX = 4;
+    function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+    function apply() {
+      var mx = lbImg.clientWidth * (scale - 1) / 2, my = lbImg.clientHeight * (scale - 1) / 2;
+      tx = clamp(tx, -mx, mx); ty = clamp(ty, -my, my);
+      lbImg.style.transform = scale > 1 ? 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')' : '';
+      lb.classList.toggle('zoomed', scale > 1);
+    }
+    function resetZoom() { scale = 1; tx = ty = 0; apply(); }
+    function zoomTo(s) { scale = clamp(s, 1, MAX); if (scale <= 1.02) { scale = 1; tx = ty = 0; } apply(); }
+
+    // Tocco: un dito scorre tra le foto (o sposta la foto ingrandita), due dita ingrandiscono
+    var t0 = null, pinch = null, lastTap = 0, lastTouch = 0;
+    stage.addEventListener('touchstart', function (e) {
+      lastTouch = Date.now();
+      if (e.touches.length === 2) {
+        var a = e.touches[0], b = e.touches[1];
+        pinch = { d: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY), s: scale };
+        t0 = null;
+      } else if (e.touches.length === 1) {
+        t0 = { x: e.touches[0].clientX, y: e.touches[0].clientY, tx: tx, ty: ty, time: Date.now(), moved: false };
+      }
+    }, { passive: true });
+    stage.addEventListener('touchmove', function (e) {
+      e.preventDefault();
+      if (pinch && e.touches.length === 2) {
+        var a = e.touches[0], b = e.touches[1];
+        zoomTo(pinch.s * Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY) / pinch.d);
+      } else if (t0 && e.touches.length === 1) {
+        var dx = e.touches[0].clientX - t0.x, dy = e.touches[0].clientY - t0.y;
+        if (Math.abs(dx) + Math.abs(dy) > 8) t0.moved = true;
+        if (scale > 1) { tx = t0.tx + dx; ty = t0.ty + dy; apply(); }
+      }
+    }, { passive: false });
     stage.addEventListener('touchend', function (e) {
-      if (x0 === null) return;
-      var dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
-      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) show(cur + (dx < 0 ? 1 : -1));
-      else if (dy > 90) close();
-      x0 = y0 = null;
+      if (pinch) { if (e.touches.length < 2) pinch = null; return; }
+      if (!t0) return;
+      var dx = e.changedTouches[0].clientX - t0.x, dy = e.changedTouches[0].clientY - t0.y;
+      if (!t0.moved) {
+        var now = Date.now();
+        if (now - lastTap < 300) { zoomTo(scale > 1 ? 1 : 2.5); lastTap = 0; }
+        else lastTap = now;
+      } else if (scale === 1) {
+        if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) show(cur + (dx < 0 ? 1 : -1));
+        else if (dy > 90) close();
+      }
+      t0 = null;
     });
+
+    // Computer: pizzico sul trackpad, doppio clic, trascinamento col mouse
+    stage.addEventListener('wheel', function (e) {
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+      zoomTo(scale * Math.exp(-e.deltaY * 0.01));
+    }, { passive: false });
+    var gs = 1;
+    stage.addEventListener('gesturestart', function (e) { e.preventDefault(); gs = scale; });
+    stage.addEventListener('gesturechange', function (e) { e.preventDefault(); zoomTo(gs * e.scale); });
+    lbImg.addEventListener('dblclick', function () {
+      if (Date.now() - lastTouch < 800) return; // sul telefono il doppio tocco è già gestito sopra
+      zoomTo(scale > 1 ? 1 : 2.5);
+    });
+    lbImg.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'touch' || scale <= 1) return;
+      e.preventDefault();
+      var sx = e.clientX, sy = e.clientY, ox = tx, oy = ty;
+      function mv(ev) { tx = ox + ev.clientX - sx; ty = oy + ev.clientY - sy; apply(); }
+      function up() { document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); }
+      document.addEventListener('pointermove', mv);
+      document.addEventListener('pointerup', up);
+    });
+    window.addEventListener('resize', function () { if (scale > 1) apply(); });
     return function open(list, i, btn) {
       items = list;
       lastBtn = btn;
@@ -395,6 +461,18 @@
     document.title = 'Work — ' + d.site.name;
     albumCards(d.albums);
   }
+
+  /* ---------- Niente zoom della pagina con due dita o col trackpad (resta solo sulla foto aperta) ---------- */
+  function lbOpen() { var l = document.getElementById('lb'); return l && l.classList.contains('open'); }
+  document.addEventListener('touchmove', function (e) {
+    if (e.touches.length > 1 && !lbOpen()) e.preventDefault();
+  }, { passive: false });
+  document.addEventListener('wheel', function (e) {
+    if (e.ctrlKey && !lbOpen()) e.preventDefault();
+  }, { passive: false });
+  ['gesturestart', 'gesturechange'].forEach(function (ev) {
+    document.addEventListener(ev, function (e) { if (!lbOpen()) e.preventDefault(); });
+  });
 
   var pages = { home: home, album: album, about: about, work: work };
   load().then(function (d) { pages[document.body.dataset.page](d); }).catch(function () {
