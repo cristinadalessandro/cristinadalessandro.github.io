@@ -18,10 +18,10 @@
   "statement": "Exploring the connection between people and places through photography, cinematic perspectives and visual storytelling.",
   "featurePhoto": "photos/travel/photos/mwpa4s4qjglxc.jpg",
   "featureVideo": {
-    "src": "photos/video/mwpf96i2.mp4",
+    "src": "photos/video/mwpf96i2.mov",
     "w": 720,
     "h": 1280,
-    "bytes": 7667849,
+    "bytes": 9236989,
     "poster": "photos/video/mwpf96i2_poster.jpg"
   }
 }
