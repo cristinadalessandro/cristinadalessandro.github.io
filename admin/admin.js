@@ -248,6 +248,7 @@
   function dropPhoto(pr, p) {
     pr.photos = pr.photos.filter(function (x) { return x !== p; });
     if (pr.cover === p.src) pr.cover = '';
+    if (site.featurePhoto === p.src) site.featurePhoto = '';
     forget(p.src);
     forget(p.thumb);
   }
@@ -350,9 +351,12 @@
       return '<div class="ph">' +
         '<div class="img"><img src="' + esc(previewUrl(p.thumb)) + '" alt="Foto ' + (i + 1) + '" loading="lazy">' +
           (isCover ? '<span class="badge">Copertina</span>' : '') +
-          (p.featured ? '<span class="badge' + (isCover ? ' b2' : '') + '">★ In homepage</span>' : '') + '</div>' +
+          (p.featured ? '<span class="badge' + (isCover ? ' b2' : '') + '">★ In homepage</span>' : '') +
+          (site.featurePhoto === p.src ? '<span class="badge" style="top:auto;bottom:6px">Foto grande in homepage</span>' : '') + '</div>' +
         '<button type="button" class="btn sm' + (p.featured ? '' : ' ghost') + '" data-act="ph-feature" data-i="' + i + '" aria-pressed="' + (p.featured ? 'true' : 'false') + '">' +
           (p.featured ? '★ In homepage · togli' : '☆ Metti in homepage') + '</button>' +
+        '<button type="button" class="btn ghost sm" data-act="ph-big" data-i="' + i + '">' +
+          (site.featurePhoto === p.src ? 'Togli come foto grande' : 'Usa come foto grande') + '</button>' +
         '<input type="text" data-cap="' + i + '" value="' + esc(p.caption || '') + '" placeholder="Didascalia (facoltativa)" aria-label="Didascalia foto ' + (i + 1) + '">' +
         '<div class="acts">' +
           '<button type="button" class="btn ghost sm" data-act="ph-left" data-i="' + i + '" aria-label="Sposta prima"' + (i === 0 ? ' disabled' : '') + '>←</button>' +
@@ -428,8 +432,10 @@
         f('name', 'Nome') +
         f('tagline', 'Sottotitolo in homepage', 'text', 'In inglese, es. "Editorial photography".') +
       '</div>' +
-      '<div class="field"><label for="t-intro">Frase breve in homepage (facoltativa, in inglese)</label>' +
-        '<input type="text" id="t-intro" data-field="intro" value="' + esc(site.intro || '') + '"></div>' +
+      '<div class="field"><label for="t-statement">Frase grande in homepage (in inglese)</label>' +
+        '<textarea id="t-statement" data-field="statement" style="min-height:80px">' + esc(site.statement || '') + '</textarea>' +
+        '<p class="hint">Compare in corsivo tra la striscia di foto e la foto grande. Se la lasci vuota non compare. ' +
+        'La foto grande la scegli da un progetto, col pulsante "Usa come foto grande".</p></div>' +
       '<div class="field"><label for="t-bio">Biografia</label>' +
         '<textarea id="t-bio" data-field="bio" style="min-height:260px">' + esc(site.bio || '') + '</textarea>' +
         '<p class="hint">Il sito è in inglese: scrivi la bio in inglese. Lascia una riga vuota per iniziare un nuovo paragrafo.</p></div>' +
@@ -576,6 +582,7 @@
       case 'ph-left': case 'ph-right':
         move(pr.photos, i, act === 'ph-left' ? -1 : 1); markDirty(); render(); return;
       case 'ph-cover': pr.cover = p.src; markDirty(); render(); return;
+      case 'ph-big': site.featurePhoto = site.featurePhoto === p.src ? '' : p.src; markDirty(); render(); return;
       case 'ph-feature': p.featured = !p.featured; if (!p.featured) delete p.featured; markDirty(); render(); return;
       case 'ph-del':
         if (!confirmTwice('photo:' + p.src)) return;

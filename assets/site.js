@@ -83,7 +83,8 @@
 
   function chrome(site, albums, current) {
     $('#brand').textContent = site.name;
-    var html = albums.map(function (a) {
+    var html = '<a href="work.html"' + (current === 'work' ? ' aria-current="page"' : '') + '>Work</a>';
+    html += albums.map(function (a) {
       return '<a href="' + albumUrl(a) + '"' + (current === a.slug ? ' aria-current="page"' : '') + '>' + esc(a.title) + '</a>';
     }).join('');
     html += '<a href="about.html"' + (current === 'about' ? ' aria-current="page"' : '') + '>About</a>';
@@ -181,36 +182,53 @@
     intro.hidden = !site.intro;
 
 
-    /* Griglia con le foto scelte per la homepage */
-    function featured(a) { return albumItems(a).filter(function (it) { return it.p.featured; }); }
-    var withPhotos = albums.filter(function (a) { return featured(a).length; });
-    if (!withPhotos.length) { $('.selection').hidden = true; }
-    var filter = 'all', current = [], open = lightbox(true), chips = $('#chips');
-    chips.innerHTML = withPhotos.length > 1
-      ? '<button type="button" class="chip" data-f="all" aria-pressed="true">All</button>' +
-        withPhotos.map(function (a) {
-          return '<button type="button" class="chip" data-f="' + esc(a.slug) + '" aria-pressed="false">' + esc(a.title) + '</button>';
-        }).join('')
-      : '';
-    function draw() {
-      current = filter === 'all'
-        ? interleave(albums.map(featured))
-        : featured(first(withPhotos, function (a) { return a.slug === filter; }));
-      $('#mosaic').innerHTML = tiles(current, true);
-      $('#mosaic-empty').hidden = !!current.length;
-      chips.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.f === filter)); });
+    /* Striscia orizzontale con le foto scelte per la homepage */
+    var open = lightbox(true);
+    var picked = interleave(albums.map(function (a) { return albumItems(a).filter(function (it) { return it.p.featured; }); }));
+    var track = $('#strip-track');
+    if (!picked.length) $('#strip').hidden = true;
+    track.innerHTML = picked.map(function (it, i) {
+      var w = it.p.tw || it.p.w || 4, h = it.p.th || it.p.h || 5;
+      return '<button type="button" class="strip-item" style="aspect-ratio:' + w + ' / ' + h + '" data-i="' + i + '" aria-label="Open photo ' + (i + 1) + '">' +
+        img(it.p, it.p.caption || it.project.title, i < 4) + '</button>';
+    }).join('');
+    track.addEventListener('click', function (e) {
+      var b = e.target.closest('.strip-item');
+      if (b) open(picked, +b.dataset.i, b);
+    });
+    function arrows() {
+      var max = track.scrollWidth - track.clientWidth - 2;
+      $('#strip-prev').disabled = track.scrollLeft <= 2;
+      $('#strip-next').disabled = track.scrollLeft >= max;
     }
-    chips.addEventListener('click', function (e) {
-      var c = e.target.closest('.chip');
-      if (c) { filter = c.dataset.f; draw(); }
-    });
-    $('#mosaic').addEventListener('click', function (e) {
-      var b = e.target.closest('.tile');
-      if (b) open(current, +b.dataset.i, b);
-    });
-    draw();
+    $('#strip-prev').addEventListener('click', function () { track.scrollBy({ left: -track.clientWidth * 0.8, behavior: 'smooth' }); });
+    $('#strip-next').addEventListener('click', function () { track.scrollBy({ left: track.clientWidth * 0.8, behavior: 'smooth' }); });
+    track.addEventListener('scroll', arrows, { passive: true });
+    window.addEventListener('resize', arrows);
+    setTimeout(arrows, 300);
 
-    /* Cartelle */
+    /* Frase */
+    if (site.statement) {
+      $('#statement-text').textContent = site.statement;
+      $('#statement').hidden = false;
+    }
+
+    /* Foto grande */
+    var feat = null;
+    albums.forEach(function (a) { albumItems(a).forEach(function (it) { if (it.p.src === site.featurePhoto) feat = it; }); });
+    if (feat) {
+      var fp = feat.p;
+      $('#feature').innerHTML = '<a href="' + (feat.album.mode === 'photos' ? albumUrl(feat.album) : projectUrl(feat.album, feat.project)) + '">' +
+        '<img src="' + esc(fp.src) + '" alt="' + esc(fp.caption || feat.project.title) + '" width="' + fp.w + '" height="' + fp.h + '" loading="lazy" decoding="async"></a>' +
+        '<figcaption>' + esc(feat.album.mode === 'photos' ? feat.album.title : feat.project.title) + '</figcaption>';
+      $('#feature').hidden = false;
+    }
+
+    albumCards(albums);
+  }
+
+  /* Copertine delle cartelle (homepage e pagina Work) */
+  function albumCards(albums) {
     $('#count').textContent = albums.length === 1 ? '1 collection' : albums.length + ' collections';
     $('#albums').innerHTML = albums.map(function (a) {
       var c = albumCover(a), label;
@@ -274,7 +292,7 @@
     if (!pr) {
       /* Copertine dei progetti */
       document.title = a.title + ' — ' + site.name;
-      $('#back').href = './';
+      $('#back').href = 'work.html';
       $('#back').textContent = '← All work';
       $('#atitle').textContent = a.title;
       var desc = $('#adesc');
@@ -347,7 +365,14 @@
     if (location.hash === '#contact') $('#contact').scrollIntoView();
   }
 
-  var pages = { home: home, album: album, about: about };
+  /* ---------- Pagina Work: tutte le cartelle ---------- */
+  function work(d) {
+    chrome(d.site, d.albums, 'work');
+    document.title = 'Work — ' + d.site.name;
+    albumCards(d.albums);
+  }
+
+  var pages = { home: home, album: album, about: about, work: work };
   load().then(function (d) { pages[document.body.dataset.page](d); }).catch(function () {
     var m = document.querySelector('main');
     if (m) m.insertAdjacentHTML('afterbegin', '<p class="empty">Could not load the content. Please refresh the page.</p>');
