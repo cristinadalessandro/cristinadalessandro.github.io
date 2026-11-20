@@ -503,7 +503,8 @@
         (fv && fv.src ? delBtn('fvideo', 'fv-remove', '', 'Rimuovi video') : '') +
       '</div>' +
       '<p class="hint" id="fv-msg">Clip breve, parte da sola in loop e senza audio. Formato <strong>MP4</strong>, massimo 40 MB ' +
-        '(ideale 10-30 secondi, orizzontale, 1080p). Se c\'è un video, prende il posto della foto grande.</p></div>';
+        '(ideale 10-30 secondi, 1080p). Se è verticale, sul sito la frase va accanto al video. Se c\'è un video, prende il posto della foto grande.<br>' +
+        'Da iPhone: imposta Impostazioni → Fotocamera → Formati → <strong>Più compatibile</strong>, altrimenti alcuni browser non lo mostrano.</p></div>';
   }
 
   function removeVideo() {

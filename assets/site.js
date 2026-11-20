@@ -221,6 +221,12 @@
         (fv.w && fv.h ? ' width="' + fv.w + '" height="' + fv.h + '"' : '') + '></video>' +
         (fv.caption ? '<figcaption>' + esc(fv.caption) + '</figcaption>' : '');
       $('#feature').hidden = false;
+      if (fv.w && fv.h && fv.h > fv.w) {
+        // video verticale: nel suo formato, con la frase accanto
+        $('#feature').classList.add('vertical');
+        if (phrase) $('#duo').classList.add('side');
+        $('#feature video').style.aspectRatio = fv.w + ' / ' + fv.h;
+      }
       var vid = $('#feature video');
       vid.muted = true;
       if (!calm && vid.play) { var pr = vid.play(); if (pr && pr.catch) pr.catch(function () { vid.controls = true; }); }
