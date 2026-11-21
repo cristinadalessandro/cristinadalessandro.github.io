@@ -1169,16 +1169,6 @@
               "caption": ""
             },
             {
-              "src": "photos/academy/una-visione-della-realta/mwqihc9517vwi.jpg",
-              "thumb": "photos/academy/una-visione-della-realta/mwqihc9517vwi_t.jpg",
-              "w": 1591,
-              "h": 2400,
-              "tw": 597,
-              "th": 900,
-              "bytes": 1529889,
-              "caption": ""
-            },
-            {
               "src": "photos/academy/una-visione-della-realta/mwqihcuufw9s8.jpg",
               "thumb": "photos/academy/una-visione-della-realta/mwqihcuufw9s8_t.jpg",
               "w": 2400,
@@ -1281,7 +1271,8 @@
             }
           ]
         }
-      ]
+      ],
+      "mode": "photos"
     }
   ]
 }
