@@ -1060,7 +1060,7 @@
       "projects": [
         {
           "slug": "una-visione-della-realta",
-          "title": "Una visione della realtà",
+          "title": "A vision of reality",
           "year": "2023",
           "place": "Utrecht, NL",
           "description": "Photography arises from the desire to represent reality. When a photographer takes a photograph, they use their experience and perspective, thus creating an image that is not merely a reproduction but an interpretation of reality itself. The interpretation of the photograph will occur without any mediation, and its meaning will be provided by the style that characterizes the reproduction, allowing you to recognize the author.\n\nCan the photographer be considered creative or simply obedient to the camera, compelled to act in a stereotypical manner?\nThe mechanical process enhances the unconscious or anything the camera can record that escapes the eye unconsciously. The result is the outcome of an action embedded in the passage of time, a representation of something that existed at a given moment.",
@@ -1087,6 +1087,17 @@
               "caption": ""
             },
             {
+              "src": "photos/academy/una-visione-della-realta/mwqihcqb41dbr.jpg",
+              "thumb": "photos/academy/una-visione-della-realta/mwqihcqb41dbr_t.jpg",
+              "w": 2400,
+              "h": 1591,
+              "tw": 900,
+              "th": 597,
+              "bytes": 1790669,
+              "caption": "",
+              "featured": true
+            },
+            {
               "src": "photos/academy/una-visione-della-realta/mwqihb0poq458.jpg",
               "thumb": "photos/academy/una-visione-della-realta/mwqihb0poq458_t.jpg",
               "w": 1591,
@@ -1105,6 +1116,17 @@
               "th": 900,
               "bytes": 1407663,
               "caption": ""
+            },
+            {
+              "src": "photos/academy/una-visione-della-realta/mwqihclfr7oaj.jpg",
+              "thumb": "photos/academy/una-visione-della-realta/mwqihclfr7oaj_t.jpg",
+              "w": 2400,
+              "h": 1591,
+              "tw": 900,
+              "th": 597,
+              "bytes": 1504724,
+              "caption": "",
+              "featured": true
             },
             {
               "src": "photos/academy/una-visione-della-realta/mwqihc3n44de2.jpg",
@@ -1127,17 +1149,6 @@
               "caption": ""
             },
             {
-              "src": "photos/academy/una-visione-della-realta/mwqihclfr7oaj.jpg",
-              "thumb": "photos/academy/una-visione-della-realta/mwqihclfr7oaj_t.jpg",
-              "w": 2400,
-              "h": 1591,
-              "tw": 900,
-              "th": 597,
-              "bytes": 1504724,
-              "caption": "",
-              "featured": true
-            },
-            {
               "src": "photos/academy/una-visione-della-realta/mwqihcnrk2bmb.jpg",
               "thumb": "photos/academy/una-visione-della-realta/mwqihcnrk2bmb_t.jpg",
               "w": 2400,
@@ -1146,17 +1157,6 @@
               "th": 597,
               "bytes": 1476582,
               "caption": ""
-            },
-            {
-              "src": "photos/academy/una-visione-della-realta/mwqihcqb41dbr.jpg",
-              "thumb": "photos/academy/una-visione-della-realta/mwqihcqb41dbr_t.jpg",
-              "w": 2400,
-              "h": 1591,
-              "tw": 900,
-              "th": 597,
-              "bytes": 1790669,
-              "caption": "",
-              "featured": true
             },
             {
               "src": "photos/academy/una-visione-della-realta/mwqihcsd4ocz3.jpg",
@@ -1272,7 +1272,7 @@
           ]
         }
       ],
-      "mode": "photos"
+      "mode": "projects"
     }
   ]
 }
