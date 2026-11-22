@@ -91,8 +91,10 @@
     $('#nav').innerHTML = html;
 
     var parts = [];
-    if (site.email) parts.push('<a href="mailto:' + esc(site.email) + '">' + esc(site.email) + '</a>');
-    if (site.instagram) {
+    // in homepage email e Instagram sono già nel blocco "Let's work together": nel piè di pagina resta solo il copyright
+    var isHome = document.body.dataset.page === 'home';
+    if (site.email && !isHome) parts.push('<a href="mailto:' + esc(site.email) + '">' + esc(site.email) + '</a>');
+    if (site.instagram && !isHome) {
       var h = site.instagram.replace(/^@/, '').trim();
       parts.push('<a href="https://instagram.com/' + encodeURIComponent(h) + '" target="_blank" rel="noopener">Instagram @' + esc(h) + '</a>');
     }
