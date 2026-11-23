@@ -854,6 +854,22 @@
     });
   }
 
+  /* Mappa del sito per Google: tutte le pagine pubbliche con foto */
+  function sitemapXml() {
+    var base = 'https://' + SITE_URL + '/', urls = [base, base + 'work.html', base + 'about.html'];
+    data.albums.forEach(function (a) {
+      if (!a.projects.some(function (p) { return p.photos.length; })) return;
+      urls.push(base + 'album.html?a=' + encodeURIComponent(a.slug));
+      if (a.mode !== 'photos') a.projects.forEach(function (p) {
+        if (p.photos.length) urls.push(base + 'album.html?a=' + encodeURIComponent(a.slug) + '&p=' + encodeURIComponent(p.slug));
+      });
+    });
+    var day = new Date().toISOString().slice(0, 10);
+    return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+      urls.map(function (u) { return '  <url><loc>' + u.replace(/&/g, '&amp;') + '</loc><lastmod>' + day + '</lastmod></url>\n'; }).join('') +
+      '</urlset>\n';
+  }
+
   /* ---------- Salvataggio: un unico aggiornamento del sito ---------- */
   $('#save').addEventListener('click', function () {
     if (busy || !dirty) return;
@@ -895,6 +911,7 @@
       });
       entries.push({ path: 'content/albums.json', mode: '100644', type: 'blob', content: JSON.stringify(data, null, 2) + '\n' });
       entries.push({ path: 'content/site.json', mode: '100644', type: 'blob', content: JSON.stringify(site, null, 2) + '\n' });
+      entries.push({ path: 'sitemap.xml', mode: '100644', type: 'blob', content: sitemapXml() });
       return api('git/trees', { method: 'POST', body: { base_tree: baseTree, tree: entries } });
     }).then(function (tree) {
       return api('git/commits', { method: 'POST', body: { message: "Aggiornamento dall'area riservata", tree: tree.sha, parents: [baseSha] } });
