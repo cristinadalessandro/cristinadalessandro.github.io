@@ -188,11 +188,23 @@ html { touch-action: pan-x pan-y; }
 }
 
 /* About e contatti */
-.about { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 64px; padding: 80px 0 96px; }
-.about-col { display: flex; flex-direction: column; gap: 32px; }
-.avatar { width: 168px; aspect-ratio: 1; border-radius: 50%; overflow: hidden; background: var(--ph); }
+.about-top { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 40px; max-width: 640px; margin: 0 auto; padding: 88px 0 104px; }
+.about-text { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+.about-top .bio p { margin-left: auto; margin-right: auto; }
+.avatar { width: 200px; aspect-ratio: 1; border-radius: 50%; overflow: hidden; background: var(--ph); }
 .avatar img { width: 100%; height: 100%; object-fit: cover; }
-@media (max-width: 640px) { .avatar { width: 128px; } }
+@media (max-width: 760px) {
+  .about-top { gap: 36px; padding: 56px 0 72px; }
+  .avatar { width: 150px; }
+}
+/* Contatti, sotto l'About */
+.contact-block { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; padding: 96px 0 120px; border-top: 1px solid var(--line); scroll-margin-top: 16px; }
+.contact-block .contacts { display: flex; flex-wrap: wrap; justify-content: center; gap: 32px 80px; width: 100%; margin-top: 28px; border-top: 0; }
+.contact-block .contacts li { flex-direction: column; align-items: center; justify-content: flex-start; gap: 10px; padding: 0; border-bottom: 0; }
+.contact-block .contacts li > span:last-child { font-family: var(--serif); font-size: clamp(20px, 2.4vw, 28px); line-height: 1.2; overflow-wrap: anywhere; }
+.contact-block .contacts a { border-bottom: 1px solid var(--line); }
+.contact-block .contacts a:hover { border-color: var(--ink); color: var(--ink); }
+@media (max-width: 560px) { .contact-block { padding: 64px 0 88px; } }
 .bio p { margin: 0 0 18px; max-width: 560px; font-size: 17px; line-height: 1.75; color: #2A2A2A; }
 .contacts { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
 .contacts li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; padding: 18px 0; border-bottom: 1px solid var(--line); }
