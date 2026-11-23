@@ -4,7 +4,7 @@
   var OWNER = 'cristinadalessandro';
   var REPO = 'cristinadalessandro.github.io';
   var BRANCH = 'main';
-  var SITE_URL = 'cristinadalessandro.github.io';
+  var SITE_URL = 'cristinadalessandro.com';
   var LIMIT = 1024 * 1024 * 1024; // 1 GB, limite di GitHub Pages
   var FULL_MAX = 2400, FULL_Q = 0.86; // foto a schermo intero
   var THUMB_MAX = 900, THUMB_Q = 0.8; // miniature

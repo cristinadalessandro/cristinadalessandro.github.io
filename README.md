@@ -1,10 +1,10 @@
 # Cristina D'Alessandro — Portfolio
 
-Sito: https://cristinadalessandro.github.io
+Sito: https://cristinadalessandro.com
 
 ## Gestire foto e testi
 
-Area riservata: https://cristinadalessandro.github.io/admin/
+Area riservata: https://cristinadalessandro.com/admin/
 
 Da lì si possono:
 - creare, rinominare, riordinare ed eliminare le cartelle (es. Portrait, Travel) e, dentro ognuna, i progetti;
