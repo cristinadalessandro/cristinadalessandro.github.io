@@ -741,17 +741,6 @@
               "caption": ""
             },
             {
-              "src": "photos/travel/photos/mwpa4qmy80yi4.jpg",
-              "thumb": "photos/travel/photos/mwpa4qmy80yi4_t.jpg",
-              "w": 2400,
-              "h": 1600,
-              "tw": 900,
-              "th": 600,
-              "bytes": 672632,
-              "caption": "",
-              "featured": true
-            },
-            {
               "src": "photos/travel/photos/mwpa4ro9agnlk.jpg",
               "thumb": "photos/travel/photos/mwpa4ro9agnlk_t.jpg",
               "w": 1600,
@@ -820,6 +809,17 @@
               "th": 900,
               "bytes": 444544,
               "caption": ""
+            },
+            {
+              "src": "photos/travel/photos/mwpa4qmy80yi4.jpg",
+              "thumb": "photos/travel/photos/mwpa4qmy80yi4_t.jpg",
+              "w": 2400,
+              "h": 1600,
+              "tw": 900,
+              "th": 600,
+              "bytes": 672632,
+              "caption": "",
+              "featured": true
             },
             {
               "src": "photos/travel/photos/mwpdzwf9gf83i.jpg",
@@ -932,8 +932,7 @@
               "tw": 900,
               "th": 600,
               "bytes": 630794,
-              "caption": "",
-              "featured": true
+              "caption": ""
             },
             {
               "src": "photos/travel/photos/mwpdzz4elbjdd.jpg",
@@ -1118,17 +1117,6 @@
               "caption": ""
             },
             {
-              "src": "photos/academy/una-visione-della-realta/mwqihclfr7oaj.jpg",
-              "thumb": "photos/academy/una-visione-della-realta/mwqihclfr7oaj_t.jpg",
-              "w": 2400,
-              "h": 1591,
-              "tw": 900,
-              "th": 597,
-              "bytes": 1504724,
-              "caption": "",
-              "featured": true
-            },
-            {
               "src": "photos/academy/una-visione-della-realta/mwqihc3n44de2.jpg",
               "thumb": "photos/academy/una-visione-della-realta/mwqihc3n44de2_t.jpg",
               "w": 2400,
@@ -1177,6 +1165,17 @@
               "th": 597,
               "bytes": 1335088,
               "caption": ""
+            },
+            {
+              "src": "photos/academy/una-visione-della-realta/mwqihclfr7oaj.jpg",
+              "thumb": "photos/academy/una-visione-della-realta/mwqihclfr7oaj_t.jpg",
+              "w": 2400,
+              "h": 1591,
+              "tw": 900,
+              "th": 597,
+              "bytes": 1504724,
+              "caption": "",
+              "featured": true
             },
             {
               "src": "photos/academy/una-visione-della-realta/mwqihcwz8usq1.jpg",
