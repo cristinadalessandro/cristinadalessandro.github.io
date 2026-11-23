@@ -192,6 +192,8 @@ body[data-page="about"] { overflow-x: clip; }
 .about-head { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; padding: 80px 0 72px; }
 .avatar { width: 200px; aspect-ratio: 1; border-radius: 50%; overflow: hidden; background: var(--ph); margin-bottom: 16px; }
 .avatar img { width: 100%; height: 100%; object-fit: cover; }
+/* titolo About me: fine, maiuscolo, spaziato */
+h1.about-kicker { margin: 8px 0 0; font-weight: 400; font-size: 19px; letter-spacing: 0.32em; }
 /* bio su due colonne allineate */
 .about-band { padding: 8px 0 112px; }
 .about-band .bio { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; column-gap: 56px; }
