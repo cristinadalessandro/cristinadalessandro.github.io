@@ -439,9 +439,17 @@
       av.innerHTML = '<img src="' + esc(pp.src) + '" alt="' + esc(site.name) + '" style="object-position:' + pos + '">';
       av.hidden = false;
     }
-    $('#bio').innerHTML = (site.bio || '').split(/\n\s*\n/).filter(Boolean).map(function (p) {
-      return '<p>' + esc(p.trim()).replace(/\n/g, '<br>') + '</p>';
-    }).join('');
+    // bio divisa in due colonne di lunghezza simile (sul telefono tornano una sotto l'altra)
+    var paras = (site.bio || '').split(/\n\s*\n/).map(function (p) { return p.trim(); }).filter(Boolean);
+    var html = paras.map(function (p) { return '<p>' + esc(p).replace(/\n/g, '<br>') + '</p>'; });
+    var total = paras.join('').length, cum = 0, cut = 1, best = Infinity;
+    for (var i = 0; i < paras.length - 1; i++) {
+      cum += paras[i].length;
+      if (Math.abs(cum - total / 2) < best) { best = Math.abs(cum - total / 2); cut = i + 1; }
+    }
+    $('#bio').innerHTML = paras.length > 1
+      ? '<div class="bio-col">' + html.slice(0, cut).join('') + '</div><div class="bio-col">' + html.slice(cut).join('') + '</div>'
+      : html.join('');
 
     var rows = [];
     if (site.email) rows.push(['Email', '<a href="mailto:' + esc(site.email) + '">' + esc(site.email) + '</a>']);

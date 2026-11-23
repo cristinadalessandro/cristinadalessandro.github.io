@@ -192,16 +192,25 @@ body[data-page="about"] { overflow-x: clip; }
 .about-head { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; padding: 80px 0 72px; }
 .avatar { width: 200px; aspect-ratio: 1; border-radius: 50%; overflow: hidden; background: var(--ph); margin-bottom: 16px; }
 .avatar img { width: 100%; height: 100%; object-fit: cover; }
-/* fascia beige a tutta larghezza con la bio */
-.about-band { background: #F3EFE9; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); padding: 88px max(40px, calc(50vw - 560px)); }
-.about-band .bio { max-width: 900px; margin: 0 auto; columns: 2; column-gap: 56px; }
-.about-band .bio p { break-inside: avoid; max-width: none; font-size: 16px; }
+/* bio su due colonne allineate */
+.about-band { padding: 8px 0 112px; }
+.about-band .bio { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; column-gap: 56px; }
+.about-band .bio-col { display: flex; flex-direction: column; justify-content: space-between; }
+.about-band .bio p { max-width: none; font-size: 16px; }
+.about-band .bio p:last-child { margin-bottom: 0; }
 .about-band + .contact-block { border-top: 0; }
+/* contatti su nero a tutto schermo: cliccando Contact si vede solo questa sezione */
+body[data-page="about"] .contact-block { background: #141414; color: #fff; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); padding-left: 20px; padding-right: 20px; min-height: 100vh; min-height: 100svh; justify-content: center; scroll-margin-top: 0; }
+body[data-page="about"] .contact-block .kicker, body[data-page="about"] .contact-block .contacts .k { color: #9A9A9A; }
+body[data-page="about"] .contact-block .contacts a { border-color: #555; }
+body[data-page="about"] .contact-block .contacts a:hover { color: #fff; border-color: #fff; }
+body[data-page="about"] .footer { border-top: 0; }
 @media (max-width: 760px) {
   .about-head { padding: 48px 0; }
   .avatar { width: 150px; }
-  .about-band { padding: 56px 20px; }
-  .about-band .bio { columns: 1; }
+  .about-band { padding: 0 0 72px; }
+  .about-band .bio { grid-template-columns: 1fr; row-gap: 18px; }
+  .about-band .bio-col { justify-content: flex-start; }
 }
 /* Contatti, sotto l'About */
 .contact-block { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; padding: 96px 0 120px; border-top: 1px solid var(--line); scroll-margin-top: 16px; }
