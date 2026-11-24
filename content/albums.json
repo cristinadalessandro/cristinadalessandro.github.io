@@ -168,13 +168,13 @@
               "caption": ""
             },
             {
-              "src": "photos/portrait/jane-austen/mwnz9i5dr1qev.jpg",
-              "thumb": "photos/portrait/jane-austen/mwnz9i5dr1qev_t.jpg",
+              "src": "photos/portrait/jane-austen/mwnz9h3emsb3j.jpg",
+              "thumb": "photos/portrait/jane-austen/mwnz9h3emsb3j_t.jpg",
               "w": 1600,
               "h": 2400,
               "tw": 600,
               "th": 900,
-              "bytes": 528195,
+              "bytes": 411658,
               "caption": "",
               "featured": true
             },
@@ -220,13 +220,13 @@
               "caption": ""
             },
             {
-              "src": "photos/portrait/jane-austen/mwnz9h3emsb3j.jpg",
-              "thumb": "photos/portrait/jane-austen/mwnz9h3emsb3j_t.jpg",
+              "src": "photos/portrait/jane-austen/mwnz9i5dr1qev.jpg",
+              "thumb": "photos/portrait/jane-austen/mwnz9i5dr1qev_t.jpg",
               "w": 1600,
               "h": 2400,
               "tw": 600,
               "th": 900,
-              "bytes": 411658,
+              "bytes": 528195,
               "caption": "",
               "featured": true
             },
