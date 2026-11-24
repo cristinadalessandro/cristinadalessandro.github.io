@@ -1308,7 +1308,22 @@
               "bytes": 242870,
               "caption": ""
             }
-          ]
+          ],
+          "exhibition": {
+            "text": "Exhibited at Museo Riso, Palermo, March 2022",
+            "photos": [
+              {
+                "src": "photos/academy/be-free-be-true-be-you/exhibition/mwurrzzgjir67.jpg",
+                "thumb": "photos/academy/be-free-be-true-be-you/exhibition/mwurrzzgjir67_t.jpg",
+                "w": 1920,
+                "h": 1080,
+                "tw": 900,
+                "th": 506,
+                "bytes": 513143,
+                "caption": ""
+              }
+            ]
+          }
         }
       ],
       "mode": "projects"
