@@ -65,13 +65,38 @@
       '" height="' + (p.th || p.h || 1125) + '"' + (eager ? '' : ' loading="lazy"') + ' decoding="async">';
   }
 
+  function ratio(p) {
+    var w = p.tw || p.w || 4, h = p.th || p.h || 5;
+    return Math.max(0.4, Math.min(3, w / h));
+  }
+  function tile(it, i, withLabel) {
+    return '<button type="button" class="tile" style="--r:' + ratio(it.p).toFixed(4) + '" data-i="' + i + '" aria-label="Open photo ' + (i + 1) + '">' +
+      '<i aria-hidden="true"></i>' + img(it.p, it.p.caption || it.project.title, i < 4) +
+      (withLabel ? '<span class="lab">' + esc(it.album.title) + '</span>' : '') + '</button>';
+  }
   function tiles(items, withLabel) {
-    return items.map(function (it, i) {
-      var w = it.p.tw || it.p.w || 4, h = it.p.th || it.p.h || 5;
-      var r = Math.max(0.4, Math.min(3, w / h)).toFixed(4);
-      return '<button type="button" class="tile" style="--r:' + r + '" data-i="' + i + '" aria-label="Open photo ' + (i + 1) + '">' +
-        '<i aria-hidden="true"></i>' + img(it.p, it.p.caption || it.project.title, i < 4) +
-        (withLabel ? '<span class="lab">' + esc(it.album.title) + '</span>' : '') + '</button>';
+    return items.map(function (it, i) { return tile(it, i, withLabel); }).join('');
+  }
+
+  /* Galleria "a libro": le foto seguono l'ordine scelto, impaginate a ritmo
+     (orizzontale grande, coppia di verticali, foto spostata a destra o a sinistra...) */
+  function bookRows(items) {
+    var rows = [], i = 0, side = 0, lastFull = false;
+    function vert(k) { return k < items.length && ratio(items[k].p) < 1; }
+    while (i < items.length) {
+      if (vert(i)) {
+        if (vert(i + 1)) { rows.push(['pair', [i, i + 1]]); i += 2; }
+        else if (i + 1 < items.length && rows.length % 3 === 2) { rows.push(['mix', [i, i + 1]]); i += 2; }
+        else { rows.push(['solo', [i]]); i += 1; }
+        lastFull = false;
+      } else {
+        if (lastFull) { rows.push([side++ % 2 ? 'offset-r' : 'offset-l', [i]]); lastFull = false; }
+        else { rows.push(['full', [i]]); lastFull = true; }
+        i += 1;
+      }
+    }
+    return rows.map(function (r) {
+      return '<div class="bk-row ' + r[0] + '">' + r[1].map(function (k) { return tile(items[k], k, false); }).join('') + '</div>';
     }).join('');
   }
 
@@ -362,8 +387,8 @@
       $('#share').textContent = 'Share this collection';
       $('#share').addEventListener('click', function () { share(a.title + ' — ' + site.name, 'Link copied'); });
       if (!gitems.length) { grid.outerHTML = '<p class="empty">Photos coming soon.</p>'; return; }
-      grid.className = 'mosaic wide project-grid';
-      grid.innerHTML = tiles(gitems, false);
+      grid.className = 'book project-grid';
+      grid.innerHTML = bookRows(gitems);
       var gopen = lightbox(false);
       grid.addEventListener('click', function (e) {
         var b = e.target.closest('.tile');

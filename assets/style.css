@@ -162,6 +162,24 @@ img { display: block; max-width: 100%; }
 .mosaic.few::after { display: none; }
 .mosaic.few .tile:only-child { flex-grow: 0; width: min(100%, calc(var(--r) * 560px)); }
 @media (max-width: 560px) { .mosaic.few { display: flex; flex-direction: column; columns: auto; gap: 8px; } .mosaic.few .tile { width: 100%; margin: 0; flex-grow: 0; } }
+/* Galleria "a libro" (Travel): impaginazione a ritmo, con tanto bianco */
+.book { padding-top: 24px; }
+.bk-row { display: flex; gap: 12px; margin: 0 auto 48px; }
+.bk-row .tile { flex: var(--r) 1 0; width: auto; }
+.bk-row.full { width: 74%; }
+.bk-row.offset-l { width: 52%; margin-left: 13%; }
+.bk-row.offset-r { width: 52%; margin-right: 13%; }
+.bk-row.pair { width: 58%; }
+.bk-row.mix { width: 86%; }
+.bk-row.solo { width: 30%; }
+@media (max-width: 760px) {
+  .bk-row { gap: 6px; margin-bottom: 40px; }
+  .bk-row.full { width: 100%; }
+  .bk-row.offset-l, .bk-row.offset-r { width: 86%; margin-left: 0; margin-right: 0; }
+  .bk-row.offset-r { margin-left: auto; }
+  .bk-row.pair, .bk-row.mix { width: 100%; }
+  .bk-row.solo { width: 72%; }
+}
 /* Esposizione, sotto le foto del progetto */
 .exhibition { display: flex; flex-direction: column; gap: 16px; padding-top: 56px; border-top: 1px solid var(--line); }
 .ex-text { margin: 0 0 16px; max-width: 640px; font-family: var(--serif); font-size: clamp(22px, 2.4vw, 28px); line-height: 1.3; white-space: pre-line; }
