@@ -103,7 +103,7 @@
         a.cover = '';
       }
       if (a.coverProject == null) a.coverProject = '';
-      if (a.mode !== 'photos') a.mode = 'projects';
+      if (a.mode !== 'photos' && a.mode !== 'chapters') a.mode = 'projects';
       if (a.mode === 'photos') ensureGallery(a);
       a.projects.forEach(function (p) { if (!Array.isArray(p.photos)) p.photos = []; });
     });
@@ -313,7 +313,7 @@
       var np = a.projects.length, nf = photoCount(a);
       return '<div class="a-row">' + thumbBox(albumCover(a)) +
         '<div class="info"><div class="name">' + esc(a.title) + '</div><div class="hint">' +
-          (a.mode === 'photos' ? 'Solo foto' : np + (np === 1 ? ' progetto' : ' progetti')) + ' · ' + nf + ' foto</div></div>' +
+          (a.mode === 'photos' ? 'Solo foto' : a.mode === 'chapters' ? np + (np === 1 ? ' capitolo' : ' capitoli') : np + (np === 1 ? ' progetto' : ' progetti')) + ' · ' + nf + ' foto</div></div>' +
         '<div class="acts">' +
           '<button type="button" class="btn sm" data-act="open-album" data-slug="' + esc(a.slug) + '">Apri</button>' +
           '<button type="button" class="btn ghost sm" data-act="album-up" data-i="' + i + '" aria-label="Sposta ' + esc(a.title) + ' prima"' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
@@ -335,6 +335,7 @@
 
   /* Livello 2: progetti di una cartella */
   function renderAlbum(a) {
+    var ch = a.mode === 'chapters';
     var rows = a.projects.map(function (pr, i) {
       var n = pr.photos.length, isCover = albumCover(a) && albumCover(a) === projectCover(pr);
       return '<div class="a-row">' + thumbBox(projectCover(pr)) +
@@ -346,7 +347,7 @@
           '<button type="button" class="btn ghost sm" data-act="proj-up" data-i="' + i + '" aria-label="Sposta ' + esc(pr.title) + ' prima"' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
           '<button type="button" class="btn ghost sm" data-act="proj-down" data-i="' + i + '" aria-label="Sposta ' + esc(pr.title) + ' dopo"' + (i === a.projects.length - 1 ? ' disabled' : '') + '>↓</button>' +
           (isCover || !n ? '' : '<button type="button" class="btn ghost sm" data-act="proj-album-cover" data-slug="' + esc(pr.slug) + '">Copertina cartella</button>') +
-          delBtn('proj:' + pr.slug, 'del-proj', ' data-slug="' + esc(pr.slug) + '"', 'Elimina progetto') +
+          delBtn('proj:' + pr.slug, 'del-proj', ' data-slug="' + esc(pr.slug) + '"', ch ? 'Elimina capitolo' : 'Elimina progetto') +
         '</div></div>';
     }).join('');
     $('#view').innerHTML =
@@ -357,23 +358,39 @@
       '</div>' +
       linkHint('album.html?a=' + encodeURIComponent(a.slug), 'Link di questa cartella') +
       modeToggle(a) +
-      '<div class="section-head" style="margin:32px 0 0"><h2 class="h2" style="font-size:32px">Progetti</h2><span class="meta">L\'ordine qui è l\'ordine sul sito</span></div>' +
-      '<div class="card-list">' + (rows || '<p class="hint" style="padding:16px 0">Nessun progetto. Creane uno qui sotto.</p>') + '</div>' +
-      '<form class="new-album" id="new-project" style="max-width:820px">' +
-        '<input type="text" id="np-title" placeholder="Titolo del progetto (in inglese)" aria-label="Titolo del nuovo progetto" required>' +
-        '<input type="text" id="np-year" placeholder="Anno" aria-label="Anno" style="flex:0 1 110px">' +
-        '<input type="text" id="np-place" placeholder="Luogo" aria-label="Luogo" style="flex:0 1 180px">' +
-        '<button class="btn" type="submit">Crea progetto</button></form>';
+      (ch
+        ? '<div class="section-head" style="margin:32px 0 0"><h2 class="h2" style="font-size:32px">Capitoli</h2><span class="meta">L\'ordine qui è l\'ordine sul sito</span></div>' +
+          '<div class="card-list">' + (rows || '<p class="hint" style="padding:16px 0">Nessun capitolo. Creane uno qui sotto.</p>') + '</div>' +
+          '<form class="new-album" id="new-project" style="max-width:820px">' +
+            '<input type="text" id="np-title" placeholder="Nome del capitolo (in inglese, es. Madeira)" aria-label="Nome del nuovo capitolo" required>' +
+            '<input type="hidden" id="np-year" value=""><input type="hidden" id="np-place" value="">' +
+            '<button class="btn" type="submit">Crea capitolo</button></form>'
+        : '<div class="section-head" style="margin:32px 0 0"><h2 class="h2" style="font-size:32px">Progetti</h2><span class="meta">L\'ordine qui è l\'ordine sul sito</span></div>' +
+          '<div class="card-list">' + (rows || '<p class="hint" style="padding:16px 0">Nessun progetto. Creane uno qui sotto.</p>') + '</div>' +
+          '<form class="new-album" id="new-project" style="max-width:820px">' +
+            '<input type="text" id="np-title" placeholder="Titolo del progetto (in inglese)" aria-label="Titolo del nuovo progetto" required>' +
+            '<input type="text" id="np-year" placeholder="Anno" aria-label="Anno" style="flex:0 1 110px">' +
+            '<input type="text" id="np-place" placeholder="Luogo" aria-label="Luogo" style="flex:0 1 180px">' +
+            '<button class="btn" type="submit">Crea progetto</button></form>');
   }
 
   /* Livello 3: foto di un progetto */
   function modeToggle(a) {
-    return '<label class="check" style="margin:20px 0 0"><input type="checkbox" id="a-mode"' + (a.mode === 'photos' ? ' checked' : '') + '> ' +
-      'Solo foto, senza progetti (galleria unica, come Travel)</label>' +
-      (a.mode === 'photos' ? '' : '<p class="hint" style="margin:4px 0 0">Se la attivi, le foto di tutti i progetti di questa cartella vengono unite in un\'unica galleria.</p>');
+    function o(v, t) { return '<option value="' + v + '"' + (a.mode === v ? ' selected' : '') + '>' + t + '</option>'; }
+    return '<div class="field" style="margin:20px 0 0;max-width:560px"><label for="a-mode">Come si vede sul sito</label>' +
+      '<select id="a-mode">' +
+        o('projects', 'Progetti, ognuno con la sua pagina') +
+        o('chapters', 'Capitoli su un\'unica pagina (es. per luogo)') +
+        o('photos', 'Solo foto, un\'unica galleria') +
+      '</select></div>' +
+      (a.mode === 'photos' ? '<p class="hint" style="margin:4px 0 0">Per dividere le foto in capitoli scegli "Capitoli": le foto restano tutte in un unico capitolo, poi puoi crearne altri e spostarle.</p>' :
+       '<p class="hint" style="margin:4px 0 0">Con "Solo foto" le foto di tutti i ' + (a.mode === 'chapters' ? 'capitoli' : 'progetti') + ' vengono unite in un\'unica galleria.</p>');
   }
 
   function renderProject(a, pr, gallery) {
+    var moveTo = a.mode === 'chapters' ? a.projects.filter(function (x) { return x !== pr; }).map(function (x) {
+      return '<option value="' + esc(x.slug) + '">' + esc(x.title) + '</option>';
+    }).join('') : '';
     var cards = pr.photos.map(function (p, i) {
       var isCover = projectCover(pr) === p;
       return '<div class="ph" data-i="' + i + '">' +
@@ -386,6 +403,7 @@
         '<button type="button" class="btn ghost sm" data-act="ph-big" data-i="' + i + '">' +
           (site.featurePhoto === p.src ? 'Togli come foto grande' : 'Usa come foto grande') + '</button>' +
         '<input type="text" data-cap="' + i + '" value="' + esc(p.caption || '') + '" placeholder="Didascalia (facoltativa)" aria-label="Didascalia foto ' + (i + 1) + '">' +
+        (moveTo ? '<select data-move="' + i + '" aria-label="Sposta la foto ' + (i + 1) + ' in un altro capitolo"><option value="">Sposta in un altro capitolo…</option>' + moveTo + '</select>' : '') +
         '<div class="acts">' +
           (isCover ? '' : '<button type="button" class="btn ghost sm" data-act="ph-cover" data-i="' + i + '">Copertina</button>') +
           delBtn('photo:' + p.src, 'ph-del', ' data-i="' + i + '"') +
@@ -400,6 +418,13 @@
         '</div>' +
         linkHint('album.html?a=' + encodeURIComponent(a.slug), 'Link di questa cartella') +
         modeToggle(a) + '<div style="height:24px"></div>'
+      : a.mode === 'chapters'
+      ? '<button type="button" class="back-btn" data-act="back-album">← ' + esc(a.title) + '</button>' +
+        '<div class="field" style="margin-top:12px"><label for="p-title">Nome del capitolo (in inglese, es. Madeira)</label><input type="text" id="p-title" value="' + esc(pr.title) + '"></div>' +
+        '<div class="field"><label for="p-desc">Frase sotto il titolo (facoltativa, in inglese)</label>' +
+          '<textarea id="p-desc" style="min-height:64px">' + esc(pr.description || '') + '</textarea></div>' +
+        '<p class="hint" style="margin-top:-8px">I capitoli stanno tutti sulla pagina della cartella: ' +
+          '<a href="../album.html?a=' + encodeURIComponent(a.slug) + '" target="_blank" rel="noopener">' + SITE_URL + '/album.html?a=' + esc(a.slug) + '</a></p>'
       : '<button type="button" class="back-btn" data-act="back-album">← ' + esc(a.title) + '</button>' +
         '<div class="two" style="margin-top: 12px">' +
           '<div class="field"><label for="p-title">Titolo del progetto</label><input type="text" id="p-title" value="' + esc(pr.title) + '"></div>' +
@@ -428,7 +453,7 @@
     });
 
     /* Esposizione: testo e foto della mostra, in una sezione a parte sotto le foto */
-    if (!gallery) {
+    if (!gallery && a.mode !== 'chapters') {
       var ex = pr.exhibition || { text: '', photos: [] }, exList = exPhotos(pr);
       var exCards = exList.map(function (p, i) {
         return '<div class="ph" data-i="' + i + '">' +
@@ -677,10 +702,11 @@
     if (!a) return;
     var pr = currentProject(a);
     if (el.id === 'a-mode') {
-      if (el.checked) { a.mode = 'photos'; ensureGallery(a); }
-      else {
-        a.mode = 'projects';
-        if (a.projects[0] && a.projects[0].slug === 'photos' && a.projects[0].title === a.title) a.projects[0].title = 'Untitled';
+      var was = a.mode;
+      a.mode = el.value;
+      if (a.mode === 'photos') ensureGallery(a);
+      else if (was === 'photos' && a.projects[0] && a.projects[0].slug === 'photos' && a.projects[0].title === a.title) {
+        a.projects[0].title = a.mode === 'chapters' ? 'Chapter 1' : 'Untitled';
       }
       view.project = null; markDirty(); render(); return;
     }
@@ -692,6 +718,14 @@
     else if (el.id === 'p-place') { pr.place = el.value; markDirty(); }
     else if (el.id === 'p-desc') { pr.description = el.value; markDirty(); }
     else if (el.dataset.cap != null) { pr.photos[+el.dataset.cap].caption = el.value; markDirty(); }
+    else if (el.dataset.move != null && el.value) {
+      var to = findProject(a, el.value), mp = pr.photos[+el.dataset.move];
+      if (!to || !mp) return;
+      pr.photos = pr.photos.filter(function (x) { return x !== mp; });
+      if (pr.cover === mp.src) pr.cover = '';
+      to.photos.push(mp);
+      markDirty(); render();
+    }
     else if (el.id === 'ex-text') { exhibition(pr).text = el.value; markDirty(); }
     else if (el.dataset.excap != null) { exhibition(pr).photos[+el.dataset.excap].caption = el.value; markDirty(); }
   });
@@ -922,7 +956,7 @@
     data.albums.forEach(function (a) {
       if (!a.projects.some(function (p) { return p.photos.length; })) return;
       urls.push(base + 'album.html?a=' + encodeURIComponent(a.slug));
-      if (a.mode !== 'photos') a.projects.forEach(function (p) {
+      if (a.mode === 'projects') a.projects.forEach(function (p) {
         if (p.photos.length) urls.push(base + 'album.html?a=' + encodeURIComponent(a.slug) + '&p=' + encodeURIComponent(p.slug));
       });
     });

@@ -180,6 +180,14 @@ img { display: block; max-width: 100%; }
   .bk-row.pair, .bk-row.mix { width: 100%; }
   .bk-row.solo { width: 72%; }
 }
+/* Travel a capitoli */
+.chapter { padding-top: 24px; }
+.chapter + .chapter { margin-top: 40px; padding-top: 72px; border-top: 1px solid var(--line); }
+.ch-head { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; margin-bottom: 48px; }
+.ch-title { margin: 0; font-family: var(--serif); font-weight: 400; font-size: clamp(36px, 4.4vw, 56px); line-height: 1.05; }
+.ch-desc { margin: 4px 0 0; max-width: 520px; color: var(--soft); white-space: pre-line; }
+.chapter .book { padding-top: 0; }
+@media (max-width: 760px) { .chapter + .chapter { margin-top: 16px; padding-top: 48px; } .ch-head { margin-bottom: 32px; } }
 /* Esposizione, sotto le foto del progetto */
 .exhibition { display: flex; flex-direction: column; gap: 16px; padding-top: 56px; border-top: 1px solid var(--line); }
 .ex-text { margin: 0 0 16px; max-width: 640px; font-family: var(--serif); font-size: clamp(22px, 2.4vw, 28px); line-height: 1.3; white-space: pre-line; }

@@ -45,6 +45,8 @@
              first(a.projects, function (x) { return x.photos.length; });
     return pr ? projectCover(pr) : null;
   }
+  // cartelle che stanno su un'unica pagina: galleria (Travel) o capitoli
+  function onePage(a) { return a.mode === 'photos' || a.mode === 'chapters'; }
   function photoCount(a) { return a.projects.reduce(function (n, p) { return n + p.photos.length; }, 0); }
 
   // alterna le foto: una per progetto, a turno
@@ -80,7 +82,8 @@
 
   /* Galleria "a libro": le foto seguono l'ordine scelto, impaginate a ritmo
      (orizzontale grande, coppia di verticali, foto spostata a destra o a sinistra...) */
-  function bookRows(items) {
+  function bookRows(items, offset) {
+    offset = offset || 0;
     var rows = [], i = 0, side = 0, lastFull = false;
     function vert(k) { return k < items.length && ratio(items[k].p) < 1; }
     while (i < items.length) {
@@ -96,7 +99,7 @@
       }
     }
     return rows.map(function (r) {
-      return '<div class="bk-row ' + r[0] + '">' + r[1].map(function (k) { return tile(items[k], k, false); }).join('') + '</div>';
+      return '<div class="bk-row ' + r[0] + '">' + r[1].map(function (k) { return tile(items[k], offset + k, false); }).join('') + '</div>';
     }).join('');
   }
 
@@ -150,7 +153,7 @@
       var it = items[cur], p = it.p;
       lbImg.src = p.src;
       lbImg.alt = p.caption || it.project.title + ' ' + (cur + 1);
-      var gallery = it.album.mode === 'photos';
+      var gallery = onePage(it.album);
       $('#lb-count').textContent = (withLink ? it.album.title + (gallery ? '' : ' · ' + it.project.title) + ' · ' : '') + (cur + 1) + ' / ' + items.length;
       $('#lb-cap').textContent = p.caption || '';
       var link = $('#lb-link');
@@ -325,9 +328,9 @@
       if (!calm && vid.play) { var pr = vid.play(); if (pr && pr.catch) pr.catch(function () { vid.controls = true; }); }
     } else if (feat) {
       var fp = feat.p;
-      $('#feature').innerHTML = '<a href="' + (feat.album.mode === 'photos' ? albumUrl(feat.album) : projectUrl(feat.album, feat.project)) + '">' +
+      $('#feature').innerHTML = '<a href="' + (onePage(feat.album) ? albumUrl(feat.album) : projectUrl(feat.album, feat.project)) + '">' +
         '<img src="' + esc(fp.src) + '" alt="' + esc(fp.caption || feat.project.title) + '" width="' + fp.w + '" height="' + fp.h + '" loading="lazy" decoding="async"></a>' +
-        '<figcaption>' + esc(feat.album.mode === 'photos' ? feat.album.title : feat.project.title) + '</figcaption>';
+        '<figcaption>' + esc(onePage(feat.album) ? feat.album.title : feat.project.title) + '</figcaption>';
       $('#feature').hidden = false;
     }
 
@@ -348,7 +351,7 @@
     $('#count').textContent = albums.length === 1 ? '1 collection' : albums.length + ' collections';
     $('#albums').innerHTML = albums.map(function (a) {
       var c = albumCover(a), label;
-      if (a.mode === 'photos') {
+      if (onePage(a)) {
         var nf = photoCount(a);
         label = nf ? 'View →' : 'Coming soon';
       } else {
@@ -374,8 +377,8 @@
     }
     var grid = $('#grid');
 
-    if (a.mode === 'photos') {
-      /* Galleria unica, senza progetti */
+    if (onePage(a)) {
+      /* Galleria unica (o a capitoli) su una sola pagina */
       document.title = a.title + ' — ' + site.name;
       $('#atitle').textContent = a.title;
       var gdesc = $('#adesc');
@@ -387,8 +390,25 @@
       $('#share').textContent = 'Share this collection';
       $('#share').addEventListener('click', function () { share(a.title + ' — ' + site.name, 'Link copied'); });
       if (!gitems.length) { grid.outerHTML = '<p class="empty">Photos coming soon.</p>'; return; }
-      grid.className = 'book project-grid';
-      grid.innerHTML = bookRows(gitems);
+      if (a.mode === 'chapters') {
+        /* Un capitolo per luogo: titolo e foto, uno dopo l'altro */
+        var off = 0, num = 0;
+        grid.className = 'chapters project-grid';
+        grid.innerHTML = a.projects.filter(function (pr) { return pr.photos.length; }).map(function (pr) {
+          var its = gitems.slice(off, off + pr.photos.length), html;
+          num++;
+          html = '<section class="chapter" aria-label="' + esc(pr.title) + '">' +
+            '<div class="ch-head"><span class="meta">' + (num < 10 ? '0' : '') + num + '</span>' +
+            '<h2 class="ch-title">' + esc(pr.title) + '</h2>' +
+            (pr.description ? '<p class="ch-desc">' + esc(pr.description) + '</p>' : '') + '</div>' +
+            '<div class="book">' + bookRows(its, off) + '</div></section>';
+          off += pr.photos.length;
+          return html;
+        }).join('');
+      } else {
+        grid.className = 'book project-grid';
+        grid.innerHTML = bookRows(gitems);
+      }
       var gopen = lightbox(false);
       grid.addEventListener('click', function (e) {
         var b = e.target.closest('.tile');
