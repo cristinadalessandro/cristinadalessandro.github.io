@@ -179,7 +179,9 @@
   function usedBytes() {
     var t = ((site.profilePhoto && site.profilePhoto.bytes) || 0) + ((site.featureVideo && site.featureVideo.bytes) || 0);
     data.albums.forEach(function (a) {
-      a.projects.forEach(function (pr) { pr.photos.forEach(function (p) { t += p.bytes || 0; }); });
+      a.projects.forEach(function (pr) {
+        pr.photos.concat(exPhotos(pr)).forEach(function (p) { t += p.bytes || 0; });
+      });
     });
     return t;
   }
@@ -264,7 +266,20 @@
     forget(p.src);
     forget(p.thumb);
   }
+  function exPhotos(pr) { return (pr.exhibition && Array.isArray(pr.exhibition.photos)) ? pr.exhibition.photos : []; }
+  function exhibition(pr) {
+    if (!pr.exhibition) pr.exhibition = { text: '', photos: [] };
+    if (!Array.isArray(pr.exhibition.photos)) pr.exhibition.photos = [];
+    return pr.exhibition;
+  }
+  function dropExPhoto(pr, p) {
+    var ex = exhibition(pr);
+    ex.photos = ex.photos.filter(function (x) { return x !== p; });
+    forget(p.src);
+    forget(p.thumb);
+  }
   function dropProject(a, pr) {
+    exPhotos(pr).slice().forEach(function (p) { dropExPhoto(pr, p); });
     pr.photos.slice().forEach(function (p) { dropPhoto(pr, p); });
     a.projects = a.projects.filter(function (x) { return x !== pr; });
     if (a.coverProject === pr.slug) a.coverProject = '';
@@ -411,6 +426,45 @@
       markDirty();
       render();
     });
+
+    /* Esposizione: testo e foto della mostra, in una sezione a parte sotto le foto */
+    if (!gallery) {
+      var ex = pr.exhibition || { text: '', photos: [] }, exList = exPhotos(pr);
+      var exCards = exList.map(function (p, i) {
+        return '<div class="ph" data-i="' + i + '">' +
+          '<div class="img" title="Tieni premuto e trascina per spostare"><img src="' + esc(previewUrl(p.thumb)) + '" alt="Foto esposizione ' + (i + 1) + '" loading="lazy" draggable="false"></div>' +
+          '<input type="text" data-excap="' + i + '" value="' + esc(p.caption || '') + '" placeholder="Didascalia (facoltativa)" aria-label="Didascalia foto esposizione ' + (i + 1) + '">' +
+          '<div class="acts">' + delBtn('exphoto:' + p.src, 'ex-del', ' data-i="' + i + '"') + '</div></div>';
+      }).join('');
+      $('#view').insertAdjacentHTML('beforeend',
+        '<div class="section-head" style="margin:64px 0 8px"><h2 class="h2" style="font-size:32px">Esposizione</h2><span class="meta">facoltativa</span></div>' +
+        '<p class="hint" style="margin:0 0 20px">Se il progetto è stato esposto, scrivi dove e quando e aggiungi le foto della mostra. Sul sito compaiono sotto le foto del progetto, in una sezione a parte. Se lasci tutto vuoto, la sezione non si vede.</p>' +
+        '<div class="field"><label for="ex-text">Dove e quando (in inglese, es. "Exhibited at Palazzo Riso, Palermo — May 2022")</label>' +
+          '<textarea id="ex-text" style="min-height:64px">' + esc(ex.text || '') + '</textarea></div>' +
+        '<div class="drop" id="ex-drop">' +
+          '<p>Trascina qui le foto della mostra, oppure</p>' +
+          '<label class="btn" style="display:inline-flex;align-items:center;margin:0;text-transform:none;letter-spacing:0;font-size:13px;color:#FFFFFF">Scegli le foto della mostra' +
+            '<input type="file" id="ex-files" accept="image/*" multiple hidden></label>' +
+          '<p class="hint" id="ex-upmsg" style="margin-top:12px">Non finiscono tra le foto del progetto né in homepage.</p>' +
+        '</div>' +
+        (exCards ? '<div class="photos" id="ex-photos">' + exCards + '</div>' : ''));
+      if (exCards) sortable($('#ex-photos'), function (order) {
+        var e = exhibition(pr), old = e.photos;
+        if (!order.some(function (k, j) { return k !== j; })) return;
+        e.photos = order.map(function (k) { return old[k]; });
+        markDirty();
+        render();
+      });
+      var exDrop = $('#ex-drop');
+      ['dragenter', 'dragover'].forEach(function (ev) {
+        exDrop.addEventListener(ev, function (e) { e.preventDefault(); exDrop.classList.add('over'); });
+      });
+      ['dragleave', 'drop'].forEach(function (ev) {
+        exDrop.addEventListener(ev, function (e) { e.preventDefault(); exDrop.classList.remove('over'); });
+      });
+      exDrop.addEventListener('drop', function (e) { addFiles(a, pr, e.dataTransfer.files, true); });
+      $('#ex-files').addEventListener('change', function (e) { addFiles(a, pr, e.target.files, true); e.target.value = ''; });
+    }
 
     var drop = $('#drop');
     ['dragenter', 'dragover'].forEach(function (ev) {
@@ -638,6 +692,8 @@
     else if (el.id === 'p-place') { pr.place = el.value; markDirty(); }
     else if (el.id === 'p-desc') { pr.description = el.value; markDirty(); }
     else if (el.dataset.cap != null) { pr.photos[+el.dataset.cap].caption = el.value; markDirty(); }
+    else if (el.id === 'ex-text') { exhibition(pr).text = el.value; markDirty(); }
+    else if (el.dataset.excap != null) { exhibition(pr).photos[+el.dataset.excap].caption = el.value; markDirty(); }
   });
 
   $('#view').addEventListener('click', function (e) {
@@ -680,6 +736,11 @@
       }
     }
     if (!pr) return;
+    if (act === 'ex-del') {
+      var xp = exPhotos(pr)[i];
+      if (!xp || !confirmTwice('exphoto:' + xp.src)) return;
+      dropExPhoto(pr, xp); markDirty(); render(); return;
+    }
     var p = pr.photos[i];
     switch (act) {
       case 'ph-cover': pr.cover = p.src; markDirty(); render(); return;
@@ -817,26 +878,27 @@
     });
   }
 
-  function addFiles(a, pr, fileList) {
+  function addFiles(a, pr, fileList, toExhibition) {
     var files = Array.prototype.filter.call(fileList || [], function (f) { return /^image\//.test(f.type) || /\.(heic|heif)$/i.test(f.name); });
     if (!files.length) return;
-    var msg = $('#upmsg'), done = 0, failed = [];
+    var msgId = toExhibition ? '#ex-upmsg' : '#upmsg';
+    var msg = $(msgId), done = 0, failed = [];
     if (busy) { if (msg) msg.textContent = 'Aspetta che finisca il salvataggio, poi aggiungi le foto.'; return; }
     var chain = Promise.resolve();
     files.forEach(function (file) {
       chain = chain.then(function () {
-        var m = $('#upmsg');
+        var m = $(msgId);
         if (m) m.textContent = 'Preparo le foto… ' + (done + 1) + ' di ' + files.length;
         return decode(file).then(function (bmp) {
           return Promise.all([resize(bmp, FULL_MAX, FULL_Q), resize(bmp, THUMB_MAX, THUMB_Q)]).then(function (r) {
             if (bmp.close) bmp.close();
             var id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-            var dir = 'photos/' + a.slug + '/' + pr.slug + '/';
+            var dir = 'photos/' + a.slug + '/' + pr.slug + '/' + (toExhibition ? 'exhibition/' : '');
             var full = dir + id + '.jpg', thumb = dir + id + '_t.jpg';
             pending.set(full, r[0].blob);
             pending.set(thumb, r[1].blob);
             localUrls.set(thumb, URL.createObjectURL(r[1].blob));
-            pr.photos.push({
+            (toExhibition ? exhibition(pr).photos : pr.photos).push({
               src: full, thumb: thumb, w: r[0].w, h: r[0].h, tw: r[1].w, th: r[1].h,
               bytes: r[0].blob.size + r[1].blob.size, caption: ''
             });
@@ -847,7 +909,7 @@
     });
     chain.then(function () {
       render();
-      var m = $('#upmsg');
+      var m = $(msgId);
       if (m) m.textContent = failed.length
         ? 'Non sono riuscito a leggere: ' + failed.join(', ') + '. Prova a salvarle in JPG.'
         : 'Foto pronte. Ricordati di toccare "Salva e pubblica".';

@@ -412,6 +412,7 @@
     var pdesc = $('#adesc');
     pdesc.textContent = pr.description || '';
     pdesc.hidden = !pr.description;
+    clampText(pdesc);
     var n = pr.photos.length, info = [pr.year, pr.place].filter(Boolean).join(' · ');
     $('#acount').textContent = info;
     $('#acount').hidden = !info;
@@ -419,12 +420,50 @@
     $('#share').addEventListener('click', function () { share(pr.title + ' — ' + site.name, 'Link copied'); });
     if (!n) { grid.outerHTML = '<p class="empty">Photos coming soon.</p>'; return; }
     var items = pr.photos.map(function (p) { return { p: p, album: a, project: pr }; });
-    grid.className = 'mosaic project-grid';
+    // con poche foto le foto riempiono la riga, così non restano piccole
+    grid.className = 'mosaic project-grid' + (n <= 3 ? ' few' : '');
     grid.innerHTML = tiles(items, false);
     var open = lightbox(false);
     grid.addEventListener('click', function (e) {
       var b = e.target.closest('.tile');
       if (b) open(items, +b.dataset.i, b);
+    });
+
+    /* Esposizione: sezione a parte sotto le foto del progetto */
+    var ex = pr.exhibition || {}, exText = (ex.text || '').trim(), exPhotos = Array.isArray(ex.photos) ? ex.photos : [];
+    if (exText || exPhotos.length) {
+      var exItems = exPhotos.map(function (p) { return { p: p, album: a, project: pr }; });
+      var sec = document.createElement('section');
+      sec.className = 'exhibition';
+      sec.setAttribute('aria-label', 'Exhibition');
+      sec.innerHTML = '<p class="kicker">Exhibition</p>' +
+        (exText ? '<p class="ex-text">' + esc(exText) + '</p>' : '') +
+        (exItems.length ? '<div class="mosaic project-grid' + (exItems.length <= 3 ? ' few' : '') + '">' + tiles(exItems, false) + '</div>' : '');
+      $('#album').appendChild(sec);
+      sec.addEventListener('click', function (e) {
+        var b = e.target.closest('.tile');
+        if (b) open(exItems, +b.dataset.i, b);
+      });
+    }
+  }
+
+  /* Testi lunghi: si vedono le prime righe, poi "Read more" */
+  function clampText(el) {
+    if (el.hidden) return;
+    el.classList.add('clamp');
+    requestAnimationFrame(function () {
+      if (el.scrollHeight <= el.clientHeight + 2) { el.classList.remove('clamp'); return; }
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'more';
+      btn.textContent = 'Read more';
+      btn.setAttribute('aria-expanded', 'false');
+      btn.addEventListener('click', function () {
+        var open = el.classList.toggle('clamp') === false;
+        btn.textContent = open ? 'Show less' : 'Read more';
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      el.insertAdjacentElement('afterend', btn);
     });
   }
 
