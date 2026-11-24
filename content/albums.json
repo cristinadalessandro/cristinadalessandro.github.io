@@ -822,17 +822,6 @@
               "caption": "madeira"
             },
             {
-              "src": "photos/travel/photos/mwpdzy30a9h88.jpg",
-              "thumb": "photos/travel/photos/mwpdzy30a9h88_t.jpg",
-              "w": 1600,
-              "h": 2400,
-              "tw": 600,
-              "th": 900,
-              "bytes": 610315,
-              "caption": "",
-              "featured": true
-            },
-            {
               "src": "photos/travel/photos/mwpdzwf9gf83i.jpg",
               "thumb": "photos/travel/photos/mwpdzwf9gf83i_t.jpg",
               "w": 2400,
@@ -862,6 +851,17 @@
               "th": 900,
               "bytes": 723362,
               "caption": ""
+            },
+            {
+              "src": "photos/travel/photos/mwpdzy30a9h88.jpg",
+              "thumb": "photos/travel/photos/mwpdzy30a9h88_t.jpg",
+              "w": 1600,
+              "h": 2400,
+              "tw": 600,
+              "th": 900,
+              "bytes": 610315,
+              "caption": "",
+              "featured": true
             },
             {
               "src": "photos/travel/photos/mwv3picsu0bno.jpg",
