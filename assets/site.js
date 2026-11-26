@@ -126,7 +126,7 @@
       var h = site.instagram.replace(/^@/, '').trim();
       parts.push('<a href="https://instagram.com/' + encodeURIComponent(h) + '" target="_blank" rel="noopener">Instagram @' + esc(h) + '</a>');
     }
-    parts.push('<span>© ' + new Date().getFullYear() + ' ' + esc(site.name) + '</span>');
+    parts.push('<span>© ' + new Date().getFullYear() + ' ' + esc(site.name) + '. All rights reserved.</span>');
     $('#footer').innerHTML = parts.join('');
   }
 
@@ -313,7 +313,7 @@
       var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       $('#feature').innerHTML = '<video class="feature-video" src="' + esc(fv.src) + '"' +
         (fv.poster ? ' poster="' + esc(fv.poster) + '"' : '') +
-        (calm ? ' controls' : ' autoplay') + ' muted loop playsinline preload="metadata"' +
+        (calm ? ' controls' : ' autoplay') + ' muted loop playsinline preload="metadata" controlslist="nodownload" disablepictureinpicture' +
         (fv.w && fv.h ? ' width="' + fv.w + '" height="' + fv.h + '"' : '') + '></video>' +
         (fv.caption ? '<figcaption>' + esc(fv.caption) + '</figcaption>' : '');
       $('#feature').hidden = false;
@@ -567,6 +567,13 @@
   ['gesturestart', 'gesturechange'].forEach(function (ev) {
     document.addEventListener(ev, function (e) { if (!lbOpen()) e.preventDefault(); });
   });
+
+  /* Foto e video: niente "Salva immagine" col tasto destro o la pressione lunga, niente trascinamento */
+  function protectMedia(e) {
+    if (e.target.closest && e.target.closest('img, video, .tile, .frame, .feature, .avatar, .lb-stage')) e.preventDefault();
+  }
+  document.addEventListener('contextmenu', protectMedia);
+  document.addEventListener('dragstart', protectMedia);
 
   var pages = { home: home, album: album, about: about, work: work };
   load().then(function (d) { pages[document.body.dataset.page](d); }).catch(function () {

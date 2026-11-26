@@ -12,6 +12,8 @@
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: #FFFFFF; color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; }
 a { color: inherit; text-decoration: none; }
+/* Foto e video non si salvano col tasto destro, la pressione lunga o il trascinamento */
+img, video { -webkit-user-drag: none; user-drag: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 a:hover { color: var(--muted); }
 img { display: block; max-width: 100%; }
 [hidden] { display: none !important; }
