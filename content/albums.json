@@ -1261,7 +1261,8 @@
               "tw": 675,
               "th": 900,
               "bytes": 2020277,
-              "caption": ""
+              "caption": "",
+              "featured": true
             },
             {
               "src": "photos/travel/japan/mwxpwtxqec60n.jpg",
@@ -1304,16 +1305,6 @@
               "caption": ""
             },
             {
-              "src": "photos/travel/japan/mwxpx4y3cv6id.jpg",
-              "thumb": "photos/travel/japan/mwxpx4y3cv6id_t.jpg",
-              "w": 1800,
-              "h": 2400,
-              "tw": 675,
-              "th": 900,
-              "bytes": 1835762,
-              "caption": ""
-            },
-            {
               "src": "photos/travel/japan/mwxpx52g4k6h3.jpg",
               "thumb": "photos/travel/japan/mwxpx52g4k6h3_t.jpg",
               "w": 1800,
@@ -1321,6 +1312,16 @@
               "tw": 675,
               "th": 900,
               "bytes": 1058009,
+              "caption": ""
+            },
+            {
+              "src": "photos/travel/japan/mwxpx4y3cv6id.jpg",
+              "thumb": "photos/travel/japan/mwxpx4y3cv6id_t.jpg",
+              "w": 1800,
+              "h": 2400,
+              "tw": 675,
+              "th": 900,
+              "bytes": 1835762,
               "caption": ""
             },
             {
