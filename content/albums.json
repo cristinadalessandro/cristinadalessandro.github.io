@@ -7,118 +7,6 @@
       "cover": "",
       "projects": [
         {
-          "slug": "amber",
-          "title": "Amber",
-          "year": "2026",
-          "description": "A studio portrait project exploring masculinity through a cinematic visual language. Warm tones, subtle expressions and an intimate atmosphere come together to create a series that moves between strength, vulnerability and character.",
-          "cover": "photos/portrait/amber/mwnz16ylsiit2.jpg",
-          "photos": [
-            {
-              "src": "photos/portrait/amber/mwnz13njto4bx.jpg",
-              "thumb": "photos/portrait/amber/mwnz13njto4bx_t.jpg",
-              "w": 1600,
-              "h": 2400,
-              "tw": 600,
-              "th": 900,
-              "bytes": 444009,
-              "caption": ""
-            },
-            {
-              "src": "photos/portrait/amber/mwnz16a16qirm.jpg",
-              "thumb": "photos/portrait/amber/mwnz16a16qirm_t.jpg",
-              "w": 1600,
-              "h": 2400,
-              "tw": 600,
-              "th": 900,
-              "bytes": 169324,
-              "caption": ""
-            },
-            {
-              "src": "photos/portrait/amber/mwnz14vjx7axo.jpg",
-              "thumb": "photos/portrait/amber/mwnz14vjx7axo_t.jpg",
-              "w": 1600,
-              "h": 2400,
-              "tw": 600,
-              "th": 900,
-              "bytes": 408327,
-              "caption": "",
-              "featured": true
-            },
-            {
-              "src": "photos/portrait/amber/mwnz16pbue4x1.jpg",
-              "thumb": "photos/portrait/amber/mwnz16pbue4x1_t.jpg",
-              "w": 1600,
-              "h": 2400,
-              "tw": 600,
-              "th": 900,
-              "bytes": 212811,
-              "caption": ""
-            },
-            {
-              "src": "photos/portrait/amber/mwnz14dwm3l5r.jpg",
-              "thumb": "photos/portrait/amber/mwnz14dwm3l5r_t.jpg",
-              "w": 1600,
-              "h": 2400,
-              "tw": 600,
-              "th": 900,
-              "bytes": 343573,
-              "caption": ""
-            },
-            {
-              "src": "photos/portrait/amber/mwnz16ylsiit2.jpg",
-              "thumb": "photos/portrait/amber/mwnz16ylsiit2_t.jpg",
-              "w": 1600,
-              "h": 2400,
-              "tw": 600,
-              "th": 900,
-              "bytes": 227607,
-              "caption": "",
-              "featured": true
-            },
-            {
-              "src": "photos/portrait/amber/mwnz12n2u38y5.jpg",
-              "thumb": "photos/portrait/amber/mwnz12n2u38y5_t.jpg",
-              "w": 1600,
-              "h": 2400,
-              "tw": 600,
-              "th": 900,
-              "bytes": 331443,
-              "caption": ""
-            },
-            {
-              "src": "photos/portrait/amber/mwnz17c2gkq9u.jpg",
-              "thumb": "photos/portrait/amber/mwnz17c2gkq9u_t.jpg",
-              "w": 1600,
-              "h": 2400,
-              "tw": 600,
-              "th": 900,
-              "bytes": 192064,
-              "caption": ""
-            },
-            {
-              "src": "photos/portrait/amber/mwnz15ayhf5dl.jpg",
-              "thumb": "photos/portrait/amber/mwnz15ayhf5dl_t.jpg",
-              "w": 1600,
-              "h": 2400,
-              "tw": 600,
-              "th": 900,
-              "bytes": 371811,
-              "caption": ""
-            },
-            {
-              "src": "photos/portrait/amber/mwnz16hve9zwc.jpg",
-              "thumb": "photos/portrait/amber/mwnz16hve9zwc_t.jpg",
-              "w": 1600,
-              "h": 2400,
-              "tw": 600,
-              "th": 900,
-              "bytes": 190746,
-              "caption": ""
-            }
-          ],
-          "place": "London, UK"
-        },
-        {
           "slug": "jane-austen",
           "title": "Letters from Another Time",
           "year": "2026",
@@ -419,6 +307,118 @@
               "tw": 600,
               "th": 900,
               "bytes": 702420,
+              "caption": ""
+            }
+          ],
+          "place": "London, UK"
+        },
+        {
+          "slug": "amber",
+          "title": "Amber",
+          "year": "2026",
+          "description": "A studio portrait project exploring masculinity through a cinematic visual language. Warm tones, subtle expressions and an intimate atmosphere come together to create a series that moves between strength, vulnerability and character.",
+          "cover": "photos/portrait/amber/mwnz16ylsiit2.jpg",
+          "photos": [
+            {
+              "src": "photos/portrait/amber/mwnz13njto4bx.jpg",
+              "thumb": "photos/portrait/amber/mwnz13njto4bx_t.jpg",
+              "w": 1600,
+              "h": 2400,
+              "tw": 600,
+              "th": 900,
+              "bytes": 444009,
+              "caption": ""
+            },
+            {
+              "src": "photos/portrait/amber/mwnz16a16qirm.jpg",
+              "thumb": "photos/portrait/amber/mwnz16a16qirm_t.jpg",
+              "w": 1600,
+              "h": 2400,
+              "tw": 600,
+              "th": 900,
+              "bytes": 169324,
+              "caption": ""
+            },
+            {
+              "src": "photos/portrait/amber/mwnz14vjx7axo.jpg",
+              "thumb": "photos/portrait/amber/mwnz14vjx7axo_t.jpg",
+              "w": 1600,
+              "h": 2400,
+              "tw": 600,
+              "th": 900,
+              "bytes": 408327,
+              "caption": "",
+              "featured": true
+            },
+            {
+              "src": "photos/portrait/amber/mwnz16pbue4x1.jpg",
+              "thumb": "photos/portrait/amber/mwnz16pbue4x1_t.jpg",
+              "w": 1600,
+              "h": 2400,
+              "tw": 600,
+              "th": 900,
+              "bytes": 212811,
+              "caption": ""
+            },
+            {
+              "src": "photos/portrait/amber/mwnz14dwm3l5r.jpg",
+              "thumb": "photos/portrait/amber/mwnz14dwm3l5r_t.jpg",
+              "w": 1600,
+              "h": 2400,
+              "tw": 600,
+              "th": 900,
+              "bytes": 343573,
+              "caption": ""
+            },
+            {
+              "src": "photos/portrait/amber/mwnz16ylsiit2.jpg",
+              "thumb": "photos/portrait/amber/mwnz16ylsiit2_t.jpg",
+              "w": 1600,
+              "h": 2400,
+              "tw": 600,
+              "th": 900,
+              "bytes": 227607,
+              "caption": "",
+              "featured": true
+            },
+            {
+              "src": "photos/portrait/amber/mwnz12n2u38y5.jpg",
+              "thumb": "photos/portrait/amber/mwnz12n2u38y5_t.jpg",
+              "w": 1600,
+              "h": 2400,
+              "tw": 600,
+              "th": 900,
+              "bytes": 331443,
+              "caption": ""
+            },
+            {
+              "src": "photos/portrait/amber/mwnz17c2gkq9u.jpg",
+              "thumb": "photos/portrait/amber/mwnz17c2gkq9u_t.jpg",
+              "w": 1600,
+              "h": 2400,
+              "tw": 600,
+              "th": 900,
+              "bytes": 192064,
+              "caption": ""
+            },
+            {
+              "src": "photos/portrait/amber/mwnz15ayhf5dl.jpg",
+              "thumb": "photos/portrait/amber/mwnz15ayhf5dl_t.jpg",
+              "w": 1600,
+              "h": 2400,
+              "tw": 600,
+              "th": 900,
+              "bytes": 371811,
+              "caption": ""
+            },
+            {
+              "src": "photos/portrait/amber/mwnz16hve9zwc.jpg",
+              "thumb": "photos/portrait/amber/mwnz16hve9zwc_t.jpg",
+              "w": 1600,
+              "h": 2400,
+              "tw": 600,
+              "th": 900,
+              "bytes": 190746,
               "caption": ""
             }
           ],
