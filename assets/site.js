@@ -115,14 +115,38 @@
     return i < 0 ? esc(n) : esc(n.slice(0, i)) + '<br><em>' + esc(n.slice(i + 1)) + '</em>';
   }
 
+  /* Menu a tendina sul telefono (icona ☰) */
+  function menuButton() {
+    var top = document.querySelector('.top'), nav = $('#nav');
+    if (!top || !nav || top.querySelector('.menu-btn')) return;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'menu-btn';
+    btn.setAttribute('aria-label', 'Menu');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.setAttribute('aria-controls', 'nav');
+    btn.innerHTML = '<span></span><span></span>';
+    top.insertBefore(btn, nav);
+    function set(open) {
+      top.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', String(open));
+    }
+    btn.addEventListener('click', function () { set(!top.classList.contains('open')); });
+    nav.addEventListener('click', function (e) { if (e.target.closest('a')) set(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') set(false); });
+    document.addEventListener('click', function (e) { if (!top.contains(e.target)) set(false); });
+  }
+
   function chrome(site, albums, current) {
-    $('#brand').textContent = site.name;
+    var initials = String(site.name || '').split(/\s+/).filter(Boolean).map(function (w) { return w.charAt(0); }).join('').toUpperCase();
+    $('#brand').innerHTML = '<span class="brand-full">' + esc(site.name) + '</span><span class="brand-short" aria-hidden="true">' + esc(initials) + '</span>';
     // Work contiene tutte le cartelle (Portrait, Travel, ...): resta evidenziato anche dentro una cartella
     var inWork = current === 'work' || albums.some(function (a) { return a.slug === current; });
     var html = '<a href="work.html"' + (inWork ? ' aria-current="page"' : '') + '>Work</a>';
     html += '<a href="about.html"' + (current === 'about' ? ' aria-current="page"' : '') + '>About</a>';
     html += '<a href="about.html#contact">Contact</a>';
     $('#nav').innerHTML = html;
+    menuButton();
 
     var parts = [];
     // in homepage email e Instagram sono già nel blocco "Let's work together": nel piè di pagina resta solo il copyright

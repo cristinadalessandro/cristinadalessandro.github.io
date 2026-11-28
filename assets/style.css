@@ -26,8 +26,27 @@ img { display: block; max-width: 100%; }
 .brand { font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 500; }
 .nav { display: flex; flex-wrap: wrap; gap: 10px 32px; font-size: 13px; letter-spacing: 0.08em; }
 .nav a { padding: 4px 0; }
-@media (max-width: 640px) { .nav { gap: 8px 18px; font-size: 12.5px; letter-spacing: 0.04em; } }
 .nav a[aria-current="page"] { border-bottom: 1px solid var(--ink); }
+.menu-btn { display: none; }
+@media (max-width: 640px) {
+  .top { position: relative; flex-wrap: nowrap; padding: 26px 0; }
+  .menu-btn { display: flex; flex-direction: column; justify-content: center; gap: 7px; width: 44px; height: 44px; margin: -12px -10px -12px 0; padding: 0 10px; background: none; border: 0; cursor: pointer; color: var(--ink); }
+  .menu-btn span { display: block; height: 1px; background: currentColor; transition: transform 0.25s ease; }
+  .top.open .menu-btn span:first-child { transform: translateY(4px) rotate(45deg); }
+  .top.open .menu-btn span:last-child { transform: translateY(-4px) rotate(-45deg); }
+  .nav { display: none; position: absolute; left: 0; right: 0; top: 100%; z-index: 50; min-height: 100vh; flex-direction: column; gap: 0; padding: 16px 0 0; background: #FFFFFF; font-family: var(--serif); font-size: 34px; letter-spacing: 0; line-height: 1.2; }
+  .top.open .nav { display: flex; }
+  .top .nav a { padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .top .nav a[aria-current="page"] { font-style: italic; border-bottom-color: var(--line); }
+  /* Homepage: monogramma a sinistra e menu sulla stessa riga, niente icona */
+  body[data-page="home"] .menu-btn { display: none; }
+  body[data-page="home"] .nav { display: flex; position: static; min-height: 0; flex-direction: row; gap: 22px; padding: 0; background: none; font-family: var(--sans); font-size: 13px; letter-spacing: 0.08em; line-height: 1.6; }
+  body[data-page="home"] .top .nav a { padding: 4px 0; border-bottom: 0; }
+  body[data-page="home"] .brand { font-size: 15px; letter-spacing: 0.18em; }
+  body[data-page="home"] .brand-full { display: none; }
+  body[data-page="home"] .brand-short { display: inline; }
+}
+.brand-short { display: none; }
 
 /* Homepage */
 .kicker { margin: 0; font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); }
