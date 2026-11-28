@@ -41,6 +41,12 @@
     return first(pr.photos, function (p) { return p.src === pr.cover; }) || pr.photos[0];
   }
   function albumCover(a) {
+    if (a.coverPhoto) {
+      for (var i = 0; i < a.projects.length; i++) {
+        var own = first(a.projects[i].photos, function (p) { return p.src === a.coverPhoto; });
+        if (own) return own;
+      }
+    }
     var pr = first(a.projects, function (x) { return x.slug === a.coverProject && x.photos.length; }) ||
              first(a.projects, function (x) { return x.photos.length; });
     return pr ? projectCover(pr) : null;

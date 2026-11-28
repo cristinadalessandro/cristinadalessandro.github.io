@@ -103,6 +103,7 @@
         a.cover = '';
       }
       if (a.coverProject == null) a.coverProject = '';
+      if (a.coverPhoto == null) a.coverPhoto = '';
       if (a.mode !== 'photos' && a.mode !== 'chapters') a.mode = 'projects';
       if (a.mode === 'photos') ensureGallery(a);
       a.projects.forEach(function (p) { if (!Array.isArray(p.photos)) p.photos = []; });
@@ -215,7 +216,17 @@
   function projectCover(pr) {
     return first(pr.photos, function (p) { return p.src === pr.cover; }) || pr.photos[0] || null;
   }
+  function albumPhoto(a, src) {
+    if (!src) return null;
+    for (var i = 0; i < a.projects.length; i++) {
+      var f = first(a.projects[i].photos, function (p) { return p.src === src; });
+      if (f) return f;
+    }
+    return null;
+  }
   function albumCover(a) {
+    var own = albumPhoto(a, a.coverPhoto);
+    if (own) return own;
     var pr = first(a.projects, function (x) { return x.slug === a.coverProject && x.photos.length; }) ||
              first(a.projects, function (x) { return x.photos.length; });
     return pr ? projectCover(pr) : null;
@@ -229,6 +240,7 @@
       a.projects = [keep];
     }
     a.coverProject = '';
+    a.coverPhoto = '';
     return a.projects[0];
   }
   function currentProject(a) {
@@ -262,6 +274,7 @@
   function dropPhoto(pr, p) {
     pr.photos = pr.photos.filter(function (x) { return x !== p; });
     if (pr.cover === p.src) pr.cover = '';
+    data.albums.forEach(function (a) { if (a.coverPhoto === p.src) a.coverPhoto = ''; });
     if (site.featurePhoto === p.src) site.featurePhoto = '';
     forget(p.src);
     forget(p.thumb);
@@ -337,7 +350,7 @@
   function renderAlbum(a) {
     var ch = a.mode === 'chapters';
     var rows = a.projects.map(function (pr, i) {
-      var n = pr.photos.length, isCover = albumCover(a) && albumCover(a) === projectCover(pr);
+      var n = pr.photos.length, isCover = !albumPhoto(a, a.coverPhoto) && albumCover(a) && albumCover(a) === projectCover(pr);
       return '<div class="a-row">' + thumbBox(projectCover(pr)) +
         '<div class="info"><div class="name">' + esc(pr.title) + '</div><div class="hint">' +
           [pr.year, pr.place].filter(Boolean).map(esc).concat([n + ' foto']).join(' · ') + (n ? '' : ' · non visibile sul sito finché è vuoto') +
@@ -357,6 +370,7 @@
         '<div class="field"><label for="a-desc">Descrizione (facoltativa, in inglese)</label><input type="text" id="a-desc" value="' + esc(a.description || '') + '"></div>' +
       '</div>' +
       linkHint('album.html?a=' + encodeURIComponent(a.slug), 'Link di questa cartella') +
+      coverHint(a) +
       modeToggle(a) +
       (ch
         ? '<div class="section-head" style="margin:32px 0 0"><h2 class="h2" style="font-size:32px">Capitoli</h2><span class="meta">L\'ordine qui è l\'ordine sul sito</span></div>' +
@@ -372,6 +386,18 @@
             '<input type="text" id="np-year" placeholder="Anno" aria-label="Anno" style="flex:0 1 110px">' +
             '<input type="text" id="np-place" placeholder="Luogo" aria-label="Luogo" style="flex:0 1 180px">' +
             '<button class="btn" type="submit">Crea progetto</button></form>');
+  }
+
+  // Copertina della cartella: una foto scelta a mano, diversa dalle copertine dei progetti
+  function coverHint(a) {
+    var own = albumPhoto(a, a.coverPhoto), c = albumCover(a);
+    return '<div class="a-row" style="margin:20px 0 0;max-width:820px">' + thumbBox(c) +
+      '<div class="info"><div class="name">Copertina della cartella</div><div class="hint">' +
+        (own ? 'Foto scelta da te. Per cambiarla apri un ' + (a.mode === 'chapters' ? 'capitolo' : 'progetto') + ' e tocca "Copertina cartella" su un\'altra foto.'
+             : 'Ora è la copertina di un ' + (a.mode === 'chapters' ? 'capitolo' : 'progetto') + '. Per usare una foto diversa apri un ' + (a.mode === 'chapters' ? 'capitolo' : 'progetto') + ' e tocca "Copertina cartella" sulla foto che vuoi.') +
+      '</div></div>' +
+      (own ? '<div class="acts"><button type="button" class="btn ghost sm" data-act="album-cover-reset">Torna alla copertina del ' + (a.mode === 'chapters' ? 'capitolo' : 'progetto') + '</button></div>' : '') +
+      '</div>';
   }
 
   /* Livello 3: foto di un progetto */
@@ -392,11 +418,13 @@
       return '<option value="' + esc(x.slug) + '">' + esc(x.title) + '</option>';
     }).join('') : '';
     var cards = pr.photos.map(function (p, i) {
-      var isCover = projectCover(pr) === p;
+      var isCover = projectCover(pr) === p, isAlbumCover = !gallery && a.coverPhoto === p.src, nb = 0;
+      function badge(t) { var top = 6 + 24 * (nb++); return '<span class="badge" style="top:' + top + 'px">' + t + '</span>'; }
       return '<div class="ph" data-i="' + i + '">' +
         '<div class="img" title="Tieni premuto e trascina per spostare"><img src="' + esc(previewUrl(p.thumb)) + '" alt="Foto ' + (i + 1) + '" loading="lazy" draggable="false">' +
-          (isCover ? '<span class="badge">Copertina</span>' : '') +
-          (p.featured ? '<span class="badge' + (isCover ? ' b2' : '') + '">★ In homepage</span>' : '') +
+          (isCover ? badge(gallery ? 'Copertina' : (a.mode === 'chapters' ? 'Copertina capitolo' : 'Copertina progetto')) : '') +
+          (isAlbumCover ? badge('Copertina ' + esc(a.title)) : '') +
+          (p.featured ? badge('★ In homepage') : '') +
           (site.featurePhoto === p.src ? '<span class="badge" style="top:auto;bottom:6px">Foto grande in homepage</span>' : '') + '</div>' +
         '<button type="button" class="btn sm' + (p.featured ? '' : ' ghost') + '" data-act="ph-feature" data-i="' + i + '" aria-pressed="' + (p.featured ? 'true' : 'false') + '">' +
           (p.featured ? '★ In homepage · togli' : '☆ Metti in homepage') + '</button>' +
@@ -405,7 +433,8 @@
         '<input type="text" data-cap="' + i + '" value="' + esc(p.caption || '') + '" placeholder="Didascalia (facoltativa)" aria-label="Didascalia foto ' + (i + 1) + '">' +
         (moveTo ? '<select data-move="' + i + '" aria-label="Sposta la foto ' + (i + 1) + ' in un altro capitolo"><option value="">Sposta in un altro capitolo…</option>' + moveTo + '</select>' : '') +
         '<div class="acts">' +
-          (isCover ? '' : '<button type="button" class="btn ghost sm" data-act="ph-cover" data-i="' + i + '">Copertina</button>') +
+          (isCover ? '' : '<button type="button" class="btn ghost sm" data-act="ph-cover" data-i="' + i + '">' + (gallery ? 'Copertina' : (a.mode === 'chapters' ? 'Copertina capitolo' : 'Copertina progetto')) + '</button>') +
+          (gallery || isAlbumCover ? '' : '<button type="button" class="btn ghost sm" data-act="ph-album-cover" data-i="' + i + '">Copertina cartella</button>') +
           delBtn('photo:' + p.src, 'ph-del', ' data-i="' + i + '"') +
         '</div></div>';
     }).join('');
@@ -762,7 +791,8 @@
     switch (act) {
       case 'proj-up': case 'proj-down':
         move(a.projects, i, act === 'proj-up' ? -1 : 1); markDirty(); render(); return;
-      case 'proj-album-cover': a.coverProject = b.dataset.slug; markDirty(); render(); return;
+      case 'proj-album-cover': a.coverProject = b.dataset.slug; a.coverPhoto = ''; markDirty(); render(); return;
+      case 'album-cover-reset': a.coverPhoto = ''; markDirty(); render(); return;
       case 'del-proj': {
         var tp = findProject(a, b.dataset.slug);
         if (!tp || !confirmTwice('proj:' + tp.slug)) return;
@@ -778,6 +808,7 @@
     var p = pr.photos[i];
     switch (act) {
       case 'ph-cover': pr.cover = p.src; markDirty(); render(); return;
+      case 'ph-album-cover': a.coverPhoto = p.src; markDirty(); render(); return;
       case 'ph-big': site.featurePhoto = site.featurePhoto === p.src ? '' : p.src; markDirty(); render(); return;
       case 'ph-feature': p.featured = !p.featured; if (!p.featured) delete p.featured; markDirty(); render(); return;
       case 'ph-del':
