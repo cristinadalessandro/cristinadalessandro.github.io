@@ -764,7 +764,8 @@
         }
       ],
       "coverProject": "jane-austen",
-      "mode": "projects"
+      "mode": "projects",
+      "coverPhoto": "photos/portrait/jane-austen/mwnz9g21f1x3r.jpg"
     },
     {
       "slug": "travel",
@@ -1259,7 +1260,8 @@
         }
       ],
       "coverProject": "",
-      "mode": "chapters"
+      "mode": "chapters",
+      "coverPhoto": ""
     },
     {
       "slug": "academy",
@@ -1535,7 +1537,8 @@
           }
         }
       ],
-      "mode": "projects"
+      "mode": "projects",
+      "coverPhoto": ""
     }
   ]
 }
